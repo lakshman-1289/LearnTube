@@ -105,10 +105,10 @@ Assessment & Certification
 
 ## 👥 Team Members
 
-* **Lakshman** – Team Leader
-* **Karthik** – Developer
-* **Sagar** – Developer
-* **Sudhakar** – Developer
+* **Lakshman** 
+* **Karthik**
+* **Sagar**
+* **Sudhakar**
 
 ---
 
