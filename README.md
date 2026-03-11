@@ -63,8 +63,8 @@ This enables students to convert **free video content into structured courses**.
 * Tailwind CSS (optional)
 
 ### Backend
-
-* Node.js / Express
+* FastAPI (Python)
+* Modular Monolithic Backend Architecture
 
 ### AI Processing
 
@@ -77,7 +77,7 @@ This enables students to convert **free video content into structured courses**.
 ### External Services
 
 * YouTube transcript extraction
-* OpenAI / OpenRouter APIs
+* Groq API for AI course generation
 
 ---
 
@@ -85,19 +85,19 @@ This enables students to convert **free video content into structured courses**.
 
 ```
 User
-  ↓
+↓
 Frontend (React / Next.js)
-  ↓
-Backend API (Node.js)
-  ↓
+↓
+FastAPI Backend
+↓
 YouTube Transcript Extraction
-  ↓
-Python AI Processing
-  ↓
+↓
+AI Processing (NLP)
+↓
 Course Generator
-  ↓
+↓
 Database Storage
-  ↓
+↓
 Assessment & Certification
 ```
 
