@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>SmartCourse Notes</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<h1>SmartCourse Notes Generator</h1>
+
+<form method="POST">
+
+<input type="text" name="name" placeholder="Your Name" required>
+
+<input type="text" name="url" placeholder="Paste YouTube link" required>
+
+<button type="submit">Generate</button>
+
+</form>
+
+{% if error %}
+
+<p class="error">Error: {{ error }}</p>
+
+{% endif %}
+
+{% if video_id and not error %}
+
+<div class="video-container">
+<div class="video">
+
+<iframe width="560" height="315"
+src="https://www.youtube.com/embed/{{video_id}}"
+frameborder="0"
+allowfullscreen>
+</iframe>
+
+</div>
+</div>
+
+<div class="content-container">
+
+{% if notes %}
+<div class="notes">
+
+<h2>Generated Notes</h2>
+<div class="notes-content">
+<pre>{{notes}}</pre>
+</div>
+<div class="notes-actions">
+<button type="button" onclick="downloadNotes()">📥 Download Notes</button>
+</div>
+
+</div>
+
+<script>
+function downloadNotes() {
+    const text = "{{notes}}".replace(/'/g, "\\'");
+    const element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+    element.setAttribute("download", "notes.txt");
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+</script>
+{% endif %}
+
+{% if transcript %}
+<div class="transcript">
+
+<h2>Full Transcript</h2>
+<div class="transcript-content">
+<p>{{transcript}}</p>
+</div>
+<div class="transcript-actions">
+<button type="button" onclick="downloadTranscript()">📥 Download Transcript</button>
+</div>
+
+</div>
+
+<script>
+function downloadTranscript() {
+    const text = "{{transcript}}".replace(/'/g, "\\'");
+    const element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+    element.setAttribute("download", "transcript.txt");
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+</script>
+{% endif %}
+
+</div>
+
+{% if topics %}
+<h2>📍 Key Topics & Timestamps</h2>
+
+<div class="topics-container">
+{% for topic in topics %}
+<div class="topic-item">
+<a href="https://www.youtube.com/watch?v={{video_id}}&t={{topic.timestamp}}" class="topic-link">
+<span class="topic-time">{{ "%d:%02d"|format(topic.timestamp // 60, topic.timestamp % 60) }}</span>
+<span class="topic-title">{{ topic.topic }}</span>
+</a>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+{% if quiz %}
+<h2>🧠 Quiz</h2>
+<div class="quiz-container">
+<form method="POST" action="/submit_quiz">
+{% for q in quiz %}
+<div class="quiz-question">
+<h3>Question {{ loop.index }}</h3>
+<p class="question-text">{{q.question}}</p>
+<div class="options">
+{% for option in q.options %}
+<label class="option">
+<input type="radio" name="q{{ loop.index0 }}" value="{{ option }}" required>
+<span class="option-text">{{ option }}</span>
+</label>
+{% endfor %}
+</div>
+</div>
+{% endfor %}
+<div class="quiz-submit">
+<button type="submit">Submit Quiz</button>
+</div>
+</form>
+</div>
+{% endif %}
+
+{% endif %}
+
+</body>
+</html>

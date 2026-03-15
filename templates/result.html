@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quiz Result</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Quiz Result</h1>
+<p>Your score: {{ score }}/{{ total }} ({{ "%.1f"|format(percentage) }}%)</p>
+{% if percentage >= 60 %}
+<p>Congratulations! You passed. <a href="/certificate">Download Certificate</a></p>
+{% else %}
+<p>You need at least 60% to get the certificate. Try again.</p>
+{% endif %}
+<p><a href="/">Back to Home</a></p>
+</body>
+</html>

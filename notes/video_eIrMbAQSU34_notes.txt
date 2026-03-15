@@ -1,0 +1,2362 @@
+
+=== COMPLETE STUDY NOTES ===
+
+=== Part 1 ===
+# **Java Programming: Foundations & First Steps**
+*By Mosh Hamedani*
+
+---
+
+## **Key Concepts**
+- **Java Development Kit (JDK)**: Software environment for building Java applications (includes compiler, Java Runtime Environment, and reusable code).
+- **Code Editor/IDE**: Tools like IntelliJ IDEA, Eclipse, or NetBeans for writing and managing Java code.
+- **Functions/Methods**:
+  - A block of code that performs a specific task.
+  - In Java, functions inside classes are called *methods*.
+- **Classes**: Containers for related methods (functions) used to organize code.
+- **Main Method**: The entry point of a Java program (`public static void main(String[] args)`).
+- **Access Modifiers**: Keywords like `public` or `private` that control visibility of classes/methods.
+- **Naming Conventions**:
+  - **PascalCase** for classes (e.g., `HelloWorld`).
+  - **camelCase** for methods (e.g., `sendEmail`).
+- **Packages**: Used to group related classes (e.g., `com.codewithmosh`).
+
+---
+
+## **Important Points**
+
+### **1. Setting Up Java**
+- **JDK Installation**:
+  - Download from [Oracle’s Java SE page](https://www.oracle.com/java/technologies/javase-downloads.html).
+  - Accept the license agreement and install for your OS (Windows/macOS/Linux).
+- **IDE Setup**:
+  - IntelliJ IDEA (Community Edition is free) is recommended for beginners.
+  - Drag the downloaded `.dmg` (macOS) or `.exe` (Windows) to the Applications folder.
+
+### **2. Anatomy of a Java Program**
+- **Structure**:
+  ```java
+  public class Main {                  // Class (PascalCase)
+      public static void main(String[] args) {  // Main method (entry point)
+          System.out.println("Hello World!");   // Code to execute
+      }
+  }
+  ```
+- **Key Components**:
+  - **Class**: Must match the filename (e.g., `Main.java`).
+  - **Main Method**: Required to run the program.
+  - **Curly Braces `{}`**: Define the scope of classes/methods.
+  - **Semicolons `;`**: Terminate statements.
+
+### **3. Functions vs. Methods**
+- **Function**: A standalone block of code (e.g., in Python).
+- **Method**: A function inside a class (Java’s version of functions).
+  - Example:
+    ```java
+    public void sendEmail(String recipient, String subject) {
+        // Code to send email
+    }
+    ```
+  - **Return Type**:
+    - `void`: No return value.
+    - `int`, `String`, etc.: Returns a value of that type.
+
+### **4. Access Modifiers**
+- **`public`**: Accessible from any other class.
+- **`private`**: Accessible only within the same class.
+- Most classes/methods in beginner programs are `public`.
+
+### **5. Packages**
+- Organize classes into namespaces (e.g., `com.codewithmosh`).
+- Convention: Reverse domain name (e.g., `com.google` for Google).
+
+### **6. Writing Your First Program**
+1. Open IntelliJ IDEA → Create a new Java project.
+2. Select "Command Line App" template.
+3. Name the project (e.g., `HelloWorld`).
+4. Set the base package (e.g., `com.yourname`).
+5. Write the code in `Main.java`:
+   ```java
+   public class Main {
+       public static void main(String[] args) {
+           System.out.println("Hello World!");
+       }
+   }
+   ```
+6. Run the program (▶️ button in IntelliJ).
+
+---
+
+## **Examples**
+
+### **Example 1: Simple Function**
+```java
+public class Calculator {
+    // Method to add two numbers
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        int result = calc.add(5, 3);
+        System.out.println("Result: " + result);  // Output: Result: 8
+    }
+}
+```
+
+### **Example 2: Class with Methods**
+```java
+public class EmailSender {
+    // Method to send an email
+    public void sendEmail(String to, String subject, String body) {
+        System.out.println("Sending email to: " + to);
+        System.out.println("Subject: " + subject);
+        System.out.println("Body: " + body);
+    }
+
+    public static void main(String[] args) {
+        EmailSender sender = new EmailSender();
+        sender.sendEmail("user@example.com", "Hello", "This is a test email.");
+    }
+}
+```
+**Output**:
+```
+Sending email to: user@example.com
+Subject: Hello
+Body: This is a test email.
+```
+
+---
+
+## **Revision Summary**
+1. **Install JDK** and an IDE (IntelliJ IDEA recommended).
+2. **Java programs** start with a `main` method inside a class.
+3. **Classes** organize code; **methods** (functions) perform tasks.
+4. **Naming rules**:
+   - Classes: `PascalCase` (e.g., `MyClass`).
+   - Methods: `camelCase` (e.g., `myMethod`).
+5. **Access modifiers** (`public`, `private`) control visibility.
+6. **Packages** group related classes (e.g., `com.yourname`).
+7. **Run your first program** in IntelliJ to print "Hello World!".
+
+---
+**Next Steps**: Learn about variables, data types, and control flow in Java!
+
+
+=== Part 2 ===
+# **Introduction to Java Programming: Your First Java Project**
+
+---
+
+## **Key Concepts**
+- Java project structure and file organization
+- Java file extension (`.java`)
+- Package statements and their purpose
+- Class and method structure in Java
+- The `main` method and its significance
+- Comments in Java (`//`)
+- Using the `System.out.println()` method to print output
+- Compilation and execution of Java programs
+- Java bytecode and platform independence
+- Java Virtual Machine (JVM) and its role
+- Overview of Java editions and history
+
+---
+
+## **Important Points**
+
+### **1. Java Project Structure**
+- A Java project contains folders and files organized in a hierarchical structure.
+- **Project Panel**: Displays all folders and files in the project (e.g., `HelloWorld` project).
+  - **Source Folder (`src`)**: Contains the source code of the project.
+    - **Package**: A namespace that organizes related classes (e.g., `com.codewithmosh`).
+      - **Class File**: Contains Java code (e.g., `Main.java`).
+
+### **2. Java File Basics**
+- All Java files must have the `.java` extension (e.g., `Main.java`).
+- A Java file typically starts with a **package statement**, which specifies the package the class belongs to.
+  - Example: `package com.codewithmosh;`
+  - The package statement **must end with a semicolon (`;`)**.
+
+### **3. Class and Method Structure**
+- A Java program consists of **classes** and **methods**.
+  - **Class**: Defined using the `class` keyword (e.g., `public class Main { }`).
+    - The class name should match the file name (e.g., `Main.java` contains `public class Main`).
+  - **Method**: A block of code that performs a specific task.
+    - The `main` method is the **entry point** of a Java program:
+      ```java
+      public static void main(String[] args) { }
+      ```
+      - `public`: Accessible from other parts of the program.
+      - `static`: Belongs to the class (not an instance of the class).
+      - `void`: Does not return a value.
+      - `String[] args`: Parameters passed to the program (used for command-line arguments).
+
+### **4. Writing and Running Code**
+- **Comments**: Used to explain code and are ignored by the compiler.
+  - Single-line comment: `// This is a comment`
+- **Printing Output**: Use `System.out.println()` to print text to the terminal.
+  - Example: `System.out.println("Hello World");`
+    - `System`: A class in the `java.lang` package.
+    - `out`: A field of the `System` class (type `PrintStream`).
+    - `println()`: A method of the `PrintStream` class that prints a line of text.
+  - **String**: A sequence of characters enclosed in double quotes (`" "`).
+
+### **5. Compilation and Execution**
+- Java programs undergo **two main steps** to run:
+  1. **Compilation**:
+     - The Java compiler (`javac`) converts `.java` source code into **Java bytecode** (`.class` file).
+     - Bytecode is **platform-independent** (can run on any OS with a JVM).
+     - Example command: `javac Main.java`
+  2. **Execution**:
+     - The **Java Virtual Machine (JVM)** executes the bytecode.
+     - The JVM translates bytecode into **native code** (machine code specific to the OS).
+     - Example command: `java com.codewithmosh.Main`
+       - The full path to the class must include the package name (e.g., `com.codewithmosh.Main`).
+
+### **6. Java Platform Independence**
+- Java is **platform-independent** because of its **"Write Once, Run Anywhere" (WORA)** architecture.
+  - **Bytecode**: Generated during compilation and can run on any device with a JVM.
+  - **JVM**: Acts as an interpreter, converting bytecode to native code for the underlying OS.
+- Other languages like **C#** and **Python** also use a similar architecture.
+
+### **7. Java Editions**
+Java has **four editions** for different use cases:
+1. **Java Standard Edition (Java SE)**:
+   - Core Java platform used for general-purpose programming.
+   - Contains essential libraries for all Java developers.
+2. **Java Enterprise Edition (Java EE)**:
+   - Used for building large-scale, distributed systems.
+   - Built on top of Java SE with additional libraries.
+3. **Java Micro Edition (Java ME)**:
+   - Subset of Java SE designed for mobile and embedded devices.
+4. **Java Card**:
+   - Used for programming smart cards.
+
+### **8. Java History and Facts**
+- Developed by **James Gosling** in **1995** at **Sun Microsystems** (acquired by Oracle in 2010).
+- Originally named **"Oak"** (after an oak tree), then **"Green"**, and finally **"Java"** (inspired by Java coffee).
+- Latest version (as of the transcript): **Java SE 12** (released March 2019).
+- **Statistics**:
+  - ~9 million Java developers worldwide.
+  - Runs on **3 billion mobile phones**, **120 million TV sets**, and **every Blu-ray player**.
+  - Average salary of a Java developer in the US: **$100,000+ per year**.
+
+---
+
+## **Examples**
+
+### **1. Hello World Program**
+```java
+package com.codewithmosh;  // Package statement
+
+public class Main {  // Class declaration
+    public static void main(String[] args) {  // Main method
+        System.out.println("Hello World");  // Print statement
+    }
+}
+```
+- **Output**:
+  ```
+  Hello World
+  ```
+
+### **2. Compiling and Running from the Command Line**
+1. **Compile**:
+   ```sh
+   javac Main.java
+   ```
+   - Generates `Main.class` (bytecode file).
+
+2. **Run**:
+   ```sh
+   java com.codewithmosh.Main
+   ```
+   - Output:
+     ```
+     Hello World
+     ```
+
+---
+
+## **Short Revision Summary**
+
+1. **Java Project Structure**:
+   - Organized into folders (e.g., `src`), packages (e.g., `com.codewithmosh`), and classes (e.g., `Main.java`).
+
+2. **Java File Basics**:
+   - `.java` extension.
+   - Starts with a package statement (e.g., `package com.codewithmosh;`).
+
+3. **Class and Method**:
+   - Class: `public class Main { }`.
+   - Main method: `public static void main(String[] args) { }`.
+
+4. **Printing Output**:
+   - Use `System.out.println("text");`.
+
+5. **Compilation and Execution**:
+   - Compile: `javac Main.java` → Generates `.class` file (bytecode).
+   - Run: `java com.codewithmosh.Main` → Executes via JVM.
+
+6. **Platform Independence**:
+   - Java bytecode runs on any OS with a JVM.
+
+7. **Java Editions**:
+   - Java SE (Standard), Java EE (Enterprise), Java ME (Micro), Java Card.
+
+8. **Java Facts**:
+   - Developed in 1995 by James Gosling.
+   - ~9 million developers; runs on billions of devices.
+   - Average salary: $100,000+ in the US.
+
+=== Part 3 ===
+# **Java Programming Fundamentals – Study Notes**
+
+---
+
+## **Title: Java Programming Fundamentals – Part 1: Variables, Types, and Basic Syntax**
+
+---
+
+### **Key Concepts**
+
+- **Variables**: Used to temporarily store data in memory.
+- **Data Types in Java**:
+  - **Primitive Types**: Store simple values (e.g., `int`, `double`, `boolean`, `char`).
+  - **Reference Types**: Store complex objects (e.g., strings, arrays, custom objects).
+- **Variable Declaration & Initialization**:
+  - Syntax: `type name = value;`
+  - Must be initialized before use.
+- **Naming Conventions**: Use **camelCase** for variable names (e.g., `myAge`, `viewsCount`).
+- **Type Conversion (Casting)**: Converting one data type to another.
+- **Clean Code Principles**: Use meaningful variable names and avoid multiple declarations on one line.
+- **Project**: Build a **mortgage calculator** using learned concepts.
+
+---
+
+### **Important Points**
+
+#### **1. Variables in Java**
+- Variables are **containers** that hold data in memory.
+- Syntax:
+  ```java
+  int age = 30; // type identifier = value;
+  ```
+- **Initialization**: Must assign a value before using a variable.
+- **Reassignment**: Can change the value of a variable after declaration.
+  ```java
+  age = 35; // Updates the value
+  ```
+- **Copying Values**:
+  ```java
+  int myAge = 30;
+  int herAge = myAge; // herAge now holds 30
+  ```
+
+#### **2. Naming Conventions (Best Practices)**
+- Use **camelCase** for variable names (e.g., `studentName`, `isEligible`).
+- Avoid single-letter names (e.g., `x`, `n`)—use descriptive names (e.g., `viewsCount`).
+- Cannot use **Java reserved keywords** (e.g., `int`, `class`, `public`) as variable names.
+
+#### **3. Primitive Data Types**
+Used for storing simple values. Java has **8 primitive types**:
+
+| Type    | Size (Bytes) | Range / Usage                          | Example                     |
+|---------|--------------|----------------------------------------|-----------------------------|
+| `byte`  | 1            | -128 to 127                            | `byte age = 30;`            |
+| `short` | 2            | -32,768 to 32,767                      | `short temperature = 20;`   |
+| `int`   | 4            | -2B to 2B                              | `int viewsCount = 1_000_000;` |
+| `long`  | 8            | Very large numbers                     | `long population = 8_000_000_000L;` |
+| `float` | 4            | Decimal numbers (less precise)         | `float price = 10.99F;`     |
+| `double`| 8            | Decimal numbers (more precise)         | `double salary = 50000.50;` |
+| `char`  | 2            | Single Unicode character               | `char grade = 'A';`         |
+| `boolean`| 1 bit       | `true` or `false`                      | `boolean isEligible = true;`|
+
+- **Notes**:
+  - Use underscores (`_`) for readability in large numbers (e.g., `1_000_000`).
+  - Append `L` for `long`, `F` for `float` (e.g., `100L`, `3.14F`).
+  - `char` uses **single quotes** (`'A'`), `String` uses **double quotes** (`"Hello"`).
+
+#### **4. Reference Types**
+- Used for **complex objects** (e.g., strings, arrays, custom classes).
+- Example:
+  ```java
+  String name = "Alice"; // String is a reference type
+  ```
+- More details in later sections.
+
+#### **5. Clean Code Practices**
+- Declare **one variable per line** for readability.
+- Use **meaningful names** (e.g., `viewsCount` instead of `v`).
+- Avoid abbreviations unless widely understood.
+
+---
+
+### **Examples**
+
+#### **Example 1: Declaring and Using Variables**
+```java
+public class Main {
+    public static void main(String[] args) {
+        int age = 30;          // Declare and initialize
+        System.out.println(age); // Output: 30
+
+        age = 35;              // Reassign
+        System.out.println(age); // Output: 35
+
+        int myAge = 30;
+        int herAge = myAge;    // Copy value
+        System.out.println(herAge); // Output: 30
+    }
+}
+```
+
+#### **Example 2: Primitive Types in Action**
+```java
+public class DataTypes {
+    public static void main(String[] args) {
+        byte age = 30;                     // Small whole number
+        long viewsCount = 3_000_000_000L;  // Large whole number
+        float price = 10.99F;              // Decimal number
+        char grade = 'A';                  // Single character
+        boolean isEligible = true;         // Boolean value
+    }
+}
+```
+
+#### **Example 3: Type Conversion (Casting)**
+```java
+public class Casting {
+    public static void main(String[] args) {
+        int x = 10;
+        double y = x; // Implicit casting (int → double)
+        System.out.println(y); // Output: 10.0
+
+        double a = 10.5;
+        int b = (int) a; // Explicit casting (double → int)
+        System.out.println(b); // Output: 10 (decimal part lost)
+    }
+}
+```
+
+---
+
+### **Short Revision Summary**
+
+1. **Variables** store data in memory. Declare with `type name = value;`.
+2. **Primitive types** (`int`, `double`, `boolean`, etc.) store simple values.
+3. **Reference types** (e.g., `String`) store complex objects.
+4. Use **camelCase** for variable names (e.g., `studentName`).
+5. **Initialize variables** before use.
+6. **Clean code**: One variable per line, meaningful names, avoid abbreviations.
+7. **Project**: Build a **mortgage calculator** using variables, types, and user input.
+
+---
+**Next Steps**:
+- Learn about **control flow** (conditionals, loops).
+- Improve the mortgage calculator with **data validation**.
+- Explore **object-oriented programming (OOP)** in Part 2.
+
+=== Part 4 ===
+# **Java: Primitive vs. Reference Types & Strings**
+
+## **Key Concepts**
+- **Primitive Types**: Simple data types (e.g., `int`, `byte`, `boolean`) that store values directly.
+- **Reference Types**: Complex objects (e.g., `Date`, `String`, `Point`) that store references (memory addresses) to objects.
+- **Memory Management**:
+  - Primitives store values in memory.
+  - References store addresses of objects in memory.
+- **String Class**: A reference type with special syntax for initialization (no `new` required).
+- **Dot Operator (`.`)**: Used to access members (methods/fields) of objects.
+- **Packages**: Organize classes into namespaces (e.g., `java.util`, `java.awt`).
+
+---
+
+## **Important Points**
+
+### **1. Primitive vs. Reference Types**
+| Feature          | Primitive Types (`int`, `byte`, etc.) | Reference Types (`Date`, `String`, etc.) |
+|------------------|--------------------------------------|------------------------------------------|
+| **Memory**       | Stores the actual value.             | Stores a reference (address) to an object. |
+| **Initialization** | Direct assignment (`int x = 5;`).   | Requires `new` operator (e.g., `Date now = new Date();`). |
+| **Members**      | No methods/fields.                   | Has methods/fields (e.g., `string.length()`). |
+| **Copy Behavior** | Copies the value (independent).      | Copies the reference (both variables point to the same object). |
+
+### **2. Memory Allocation**
+- **Primitives**: Memory is automatically allocated/released by Java.
+- **References**: Use `new` to allocate memory (Java handles deallocation via garbage collection).
+
+### **3. Strings in Java**
+- **Special Reference Type**: Can be initialized without `new` (e.g., `String s = "Hello";`).
+- **Common Methods**:
+  - `length()`: Returns the number of characters.
+  - `endsWith(String suffix)`: Checks if the string ends with a given suffix.
+  - `startsWith(String prefix)`: Checks if the string starts with a given prefix.
+  - `concat(String str)`: Joins strings (or use `+` operator).
+
+### **4. Packages**
+- **Purpose**: Avoid naming conflicts (e.g., `java.util.Date` vs. `java.sql.Date`).
+- **Importing**: Use `import` to use classes from other packages (e.g., `import java.util.Date;`).
+- **`java.lang`**: Automatically imported (contains `String`, `System`, etc.).
+
+---
+
+## **Examples**
+
+### **1. Primitive vs. Reference Initialization**
+```java
+// Primitive (no 'new' needed)
+int age = 30;
+
+// Reference (requires 'new')
+Date now = new Date();
+```
+
+### **2. Copy Behavior**
+```java
+// Primitives: Independent copies
+int x = 1;
+int y = x;  // y = 1 (independent of x)
+x = 2;      // y remains 1
+
+// References: Same object
+Point p1 = new Point(1, 1);
+Point p2 = p1;  // p2 references the same object as p1
+p1.x = 2;       // p2.x is now 2 (same object)
+```
+
+### **3. String Operations**
+```java
+String message = "Hello, World!";
+
+// Concatenation
+String excited = message + "!!";  // "Hello, World!!!"
+
+// Methods
+boolean endsWithExclamation = message.endsWith("!");  // true
+int length = message.length();  // 13
+```
+
+---
+
+## **Revision Summary**
+1. **Primitive Types**: Store values directly (e.g., `int`, `boolean`).
+2. **Reference Types**: Store references to objects (e.g., `Date`, `String`).
+3. **Memory**:
+   - Primitives: Values stored in memory.
+   - References: Addresses stored; objects allocated with `new`.
+4. **Strings**: Special reference type with shorthand initialization (`String s = "text";`).
+5. **Packages**: Organize classes (e.g., `java.util.Date`).
+6. **Dot Operator**: Accesses object members (e.g., `string.length()`).
+
+**Key Takeaway**: Primitives are independent; references share objects. Strings are reference types but behave like primitives in initialization.
+
+=== Part 5 ===
+# **Java String and Array Methods: Study Notes**
+
+---
+
+## **Title**
+**Java String Manipulation & Arrays: Key Methods and Concepts**
+
+---
+
+## **Key Concepts**
+- **String Methods**: `length()`, `indexOf()`, `replace()`, `toLowerCase()`, `toUpperCase()`, `trim()`
+- **String Immutability**: Strings in Java cannot be modified; methods return new strings.
+- **Escape Sequences**: `\”`, `\\`, `\n`, `\t`
+- **Arrays**: Declaration, initialization, accessing elements, `length` property, sorting, multi-dimensional arrays
+- **Method Overloading**: Multiple methods with the same name but different parameters
+- **Exceptions**: Errors reported during runtime (e.g., `ArrayIndexOutOfBoundsException`)
+
+---
+
+## **Important Points**
+
+### **1. String Methods**
+#### **a. `length()`**
+- Returns the number of characters in a string.
+- Useful for validation (e.g., checking username length).
+
+#### **b. `indexOf()`**
+- Returns the **index of the first occurrence** of a character or substring.
+- Returns `-1` if the character/substring is not found.
+- Example: `"Hello".indexOf('H')` returns `0`.
+
+#### **c. `replace()`**
+- Replaces a **target** character/substring with a **replacement**.
+- **Parameters vs. Arguments**:
+  - **Parameters**: Placeholders in method definition (e.g., `target`, `replacement`).
+  - **Arguments**: Actual values passed (e.g., `"!"`, `"*"`).
+- **Does not modify the original string** (returns a new string).
+
+#### **d. `toLowerCase()` / `toUpperCase()`**
+- Converts all characters to lowercase or uppercase.
+- Returns a **new string** (original remains unchanged).
+
+#### **e. `trim()`**
+- Removes **leading and trailing whitespace**.
+- Useful for cleaning user input (e.g., form fields).
+
+---
+
+### **2. String Immutability**
+- Strings in Java **cannot be changed** after creation.
+- Any method that "modifies" a string (e.g., `replace()`, `toLowerCase()`) **returns a new string**.
+- Example:
+  ```java
+  String message = "Hello!";
+  String newMessage = message.replace("!", "*");
+  System.out.println(message); // Output: "Hello!" (unchanged)
+  ```
+
+---
+
+### **3. Escape Sequences**
+Used to include special characters in strings:
+| Escape Sequence | Description                     | Example                     |
+|-----------------|---------------------------------|-----------------------------|
+| `\"`            | Double quote                    | `"Hello \"Mars\""` → `Hello "Mars"` |
+| `\\`            | Backslash                       | `"C:\\Windows"` → `C:\Windows` |
+| `\n`            | New line                        | `"Line1\nLine2"` → Line1<br>Line2 |
+| `\t`            | Tab                             | `"Hello\tWorld"` → `Hello   World` |
+
+---
+
+### **4. Arrays**
+#### **a. Declaration & Initialization**
+- **Old Syntax**:
+  ```java
+  int[] numbers = new int[5]; // Array of size 5 (default values: 0)
+  numbers[0] = 1; // Assign value to first element
+  ```
+- **New Syntax (if values are known)**:
+  ```java
+  int[] numbers = {2, 3, 5, 1, 4}; // Array of size 5
+  ```
+
+#### **b. Accessing Elements**
+- Index starts at **0**.
+- Example:
+  ```java
+  System.out.println(numbers[0]); // Output: 2
+  ```
+- **Invalid index** (e.g., `numbers[10]`) throws `ArrayIndexOutOfBoundsException`.
+
+#### **c. `length` Property**
+- Returns the **number of elements** in the array.
+- Example:
+  ```java
+  System.out.println(numbers.length); // Output: 5
+  ```
+
+#### **d. Sorting Arrays**
+- Use `Arrays.sort()` from `java.util.Arrays`.
+- Example:
+  ```java
+  import java.util.Arrays;
+  Arrays.sort(numbers); // Sorts the array in ascending order
+  ```
+
+#### **e. Multi-Dimensional Arrays**
+- Used for matrices or cubes.
+- Example (2D array):
+  ```java
+  int[][] matrix = new int[2][3]; // 2 rows, 3 columns
+  matrix[0][0] = 1; // Assign value to first row, first column
+  ```
+
+---
+
+## **Examples**
+
+### **1. String Methods**
+```java
+String username = "Skywalker2024";
+
+// Check length
+if (username.length() > 20) {
+    System.out.println("Username too long!");
+}
+
+// Find index of 'w'
+int index = username.indexOf('w'); // Returns 3
+
+// Replace characters
+String newUsername = username.replace("2024", "2025"); // "Skywalker2025"
+
+// Trim whitespace
+String input = "  hello  ";
+String trimmedInput = input.trim(); // "hello"
+```
+
+### **2. Escape Sequences**
+```java
+// Double quotes
+String quote = "He said, \"Hello!\"";
+
+// Backslash
+String path = "C:\\Program Files\\Java";
+
+// New line
+String poem = "Roses are red,\nViolets are blue";
+
+// Tab
+String data = "Name:\tJohn";
+```
+
+### **3. Arrays**
+```java
+// Initialize array
+int[] numbers = {5, 2, 8, 1, 3};
+
+// Access element
+System.out.println(numbers[2]); // Output: 8
+
+// Sort array
+Arrays.sort(numbers); // {1, 2, 3, 5, 8}
+
+// Print array
+System.out.println(Arrays.toString(numbers)); // "[1, 2, 3, 5, 8]"
+```
+
+---
+
+## **Short Revision Summary**
+1. **String Methods**:
+   - `length()` → Check string length.
+   - `indexOf()` → Find character/substring index.
+   - `replace()` → Replace characters (returns new string).
+   - `toLowerCase()`/`toUpperCase()` → Change case.
+   - `trim()` → Remove whitespace.
+
+2. **String Immutability**:
+   - Strings **cannot be modified**; methods return new strings.
+
+3. **Escape Sequences**:
+   - `\"`, `\\`, `\n`, `\t` → Include special characters.
+
+4. **Arrays**:
+   - Fixed size; use `new` or `{}` for initialization.
+   - Access elements via index (starts at 0).
+   - `length` → Number of elements.
+   - `Arrays.sort()` → Sort array.
+   - Multi-dimensional arrays → Store matrices/cubes.
+
+5. **Exceptions**:
+   - Invalid array index → `ArrayIndexOutOfBoundsException`.
+
+---
+
+=== Part 6 ===
+# **Java Arrays, Constants, Arithmetic Expressions, and Type Conversion**
+
+---
+
+## **Key Concepts**
+- **Multi-dimensional Arrays** (2D, 3D)
+- **Array Initialization** (using `new` keyword and curly braces `{}`)
+- **Accessing Array Elements** (using row and column indices)
+- **Printing Multi-dimensional Arrays** (using `Arrays.deepToString()`)
+- **Constants** (using `final` keyword)
+- **Arithmetic Operators** (`+`, `-`, `*`, `/`, `%`)
+- **Increment & Decrement Operators** (`++`, `--`)
+- **Augmented Assignment Operators** (`+=`, `-=`, `*=`, `/=`)
+- **Operator Precedence** (PEMDAS/BODMAS rule)
+- **Type Conversion & Casting** (Implicit vs. Explicit)
+
+---
+
+## **Important Points**
+
+### **1. Multi-dimensional Arrays**
+- A **2D array** is an array of arrays (matrix-like structure).
+- Syntax:
+  ```java
+  int[][] matrix = new int[rows][columns];
+  ```
+- **Accessing elements**: Use two indices (`matrix[row][column]`).
+- **Printing 2D arrays**: Use `Arrays.deepToString()` instead of `Arrays.toString()`.
+
+#### **Example: 2D Array Initialization**
+```java
+int[][] matrix = new int[2][3]; // 2 rows, 3 columns
+matrix[0][0] = 1; // Assign value to first row, first column
+System.out.println(Arrays.deepToString(matrix)); // [[1, 0, 0], [0, 0, 0]]
+```
+
+#### **Example: Curly Brace Initialization**
+```java
+int[][] matrix = {
+    {1, 2, 3}, // First row
+    {4, 5, 6}  // Second row
+};
+System.out.println(Arrays.deepToString(matrix)); // [[1, 2, 3], [4, 5, 6]]
+```
+
+- **3D Arrays**: Add another pair of brackets (`int[][][]`).
+
+---
+
+### **2. Constants (Final Variables)**
+- A **constant** is a variable whose value **cannot be changed** after initialization.
+- Declared using the `final` keyword.
+- **Naming convention**: Use **UPPERCASE** letters (e.g., `PI`).
+
+#### **Example: Declaring a Constant**
+```java
+final float PI = 3.14F; // Correct
+PI = 1; // Compilation error (cannot modify final variable)
+```
+
+---
+
+### **3. Arithmetic Expressions**
+- **Basic Operators**:
+  - `+` (Addition)
+  - `-` (Subtraction)
+  - `*` (Multiplication)
+  - `/` (Division)
+  - `%` (Modulus - remainder of division)
+
+#### **Integer vs. Floating-Point Division**
+- **Integer division** truncates decimal places.
+- **Floating-point division** requires at least one operand to be a `float` or `double`.
+
+#### **Example: Division Types**
+```java
+int result1 = 10 / 3; // 3 (integer division)
+double result2 = (double)10 / 3; // 3.333... (floating-point division)
+```
+
+---
+
+### **4. Increment & Decrement Operators**
+- `++` (Increment by 1)
+- `--` (Decrement by 1)
+- **Prefix (`++x`)** vs. **Postfix (`x++`)** behavior:
+  - **Prefix**: Increments first, then uses the value.
+  - **Postfix**: Uses the value first, then increments.
+
+#### **Example: Prefix vs. Postfix**
+```java
+int x = 1;
+int y = x++; // y = 1, x = 2 (postfix)
+int z = ++x; // z = 3, x = 3 (prefix)
+```
+
+---
+
+### **5. Augmented Assignment Operators**
+- Shorthand for modifying a variable.
+- Examples:
+  - `x += 2` → `x = x + 2`
+  - `x -= 2` → `x = x - 2`
+  - `x *= 2` → `x = x * 2`
+  - `x /= 2` → `x = x / 2`
+
+#### **Example: Augmented Assignment**
+```java
+int x = 5;
+x += 3; // x = 8
+x *= 2; // x = 16
+```
+
+---
+
+### **6. Operator Precedence (Order of Operations)**
+- **PEMDAS/BODMAS Rule**:
+  1. **Parentheses** (highest priority)
+  2. **Multiplication & Division** (left to right)
+  3. **Addition & Subtraction** (left to right)
+
+#### **Example: Operator Precedence**
+```java
+int result = 10 + 3 * 2; // 16 (3*2 first, then +10)
+int result2 = (10 + 3) * 2; // 26 (parentheses first)
+```
+
+---
+
+### **7. Type Conversion & Casting**
+- **Implicit Casting (Automatic)**:
+  - Happens when converting a **smaller type to a larger type** (e.g., `int` → `double`).
+  - No data loss.
+
+#### **Example: Implicit Casting**
+```java
+short x = 1;
+int y = x + 2; // x is implicitly cast to int
+```
+
+- **Explicit Casting (Manual)**:
+  - Required when converting a **larger type to a smaller type** (e.g., `double` → `int`).
+  - May cause **data loss**.
+
+#### **Example: Explicit Casting**
+```java
+double x = 1.1;
+int y = (int)x + 2; // y = 3 (decimal part lost)
+```
+
+---
+
+## **Examples**
+
+### **1. Multi-dimensional Array Example**
+```java
+int[][] matrix = {
+    {1, 2, 3},
+    {4, 5, 6}
+};
+System.out.println(Arrays.deepToString(matrix)); // [[1, 2, 3], [4, 5, 6]]
+```
+
+### **2. Constant Example**
+```java
+final double PI = 3.14159;
+System.out.println(PI); // 3.14159
+// PI = 3.14; // Error: Cannot modify final variable
+```
+
+### **3. Arithmetic Operators Example**
+```java
+int a = 10, b = 3;
+System.out.println(a + b); // 13
+System.out.println(a / b); // 3 (integer division)
+System.out.println((double)a / b); // 3.333... (floating-point division)
+```
+
+### **4. Increment/Decrement Example**
+```java
+int x = 5;
+System.out.println(x++); // 5 (postfix)
+System.out.println(++x); // 7 (prefix)
+```
+
+### **5. Augmented Assignment Example**
+```java
+int y = 10;
+y += 5; // y = 15
+y *= 2; // y = 30
+```
+
+### **6. Operator Precedence Example**
+```java
+int result = 10 + 3 * 2; // 16 (3*2 first)
+int result2 = (10 + 3) * 2; // 26 (parentheses first)
+```
+
+### **7. Type Conversion Example**
+```java
+short a = 1;
+int b = a + 2; // Implicit casting (short → int)
+
+double c = 1.9;
+int d = (int)c + 2; // Explicit casting (double → int)
+```
+
+---
+
+## **Revision Summary**
+✅ **Multi-dimensional Arrays**:
+- Use `new int[rows][columns]` or curly braces `{}`.
+- Access elements with `array[row][column]`.
+- Print using `Arrays.deepToString()`.
+
+✅ **Constants**:
+- Declare with `final`.
+- Name in **UPPERCASE** (e.g., `PI`).
+
+✅ **Arithmetic Operators**:
+- `+`, `-`, `*`, `/`, `%`.
+- Integer division truncates decimals.
+- Use `(double)` for floating-point division.
+
+✅ **Increment/Decrement**:
+- `++x` (prefix) vs. `x++` (postfix).
+- Prefix increments first, postfix uses value first.
+
+✅ **Augmented Assignment**:
+- `x += 2` → `x = x + 2`.
+
+✅ **Operator Precedence**:
+- Parentheses > Multiplication/Division > Addition/Subtraction.
+
+✅ **Type Conversion**:
+- **Implicit**: Smaller → Larger type (e.g., `int` → `double`).
+- **Explicit**: Larger → Smaller type (e.g., `double` → `int`).
+
+---
+**Next Topic**: *Control Flow (if-else, loops, switch-case)* 🚀
+
+=== Part 7 ===
+# **Java Type Casting and Number Formatting – Study Notes**
+
+## **Title:**
+**Type Casting, Math Operations, and Number Formatting in Java**
+
+---
+
+## **Key Concepts**
+- **Implicit vs. Explicit Casting**
+- **Wrapper Classes & Parsing Strings to Numbers**
+- **Math Class (Rounding, Ceiling, Floor, Max/Min, Random)**
+- **Number Formatting (Currency, Percentages)**
+
+---
+
+## **Important Points**
+
+### **1. Type Casting in Java**
+#### **Implicit Casting (Automatic)**
+- Happens when **no data loss** occurs (e.g., `int` → `double`).
+- Example:
+  ```java
+  double x = 1.1;
+  double y = x + 2; // 3.1 (no data loss)
+  ```
+
+#### **Explicit Casting (Manual)**
+- Required when **data loss** may occur (e.g., `double` → `int`).
+- Syntax: `(targetType) value`
+- Example:
+  ```java
+  double x = 1.1;
+  int y = (int)x + 2; // 3 (decimal part lost)
+  ```
+- **Only works between compatible types** (e.g., numbers, not `String` → `int`).
+
+---
+
+### **2. Converting Strings to Numbers (Wrapper Classes)**
+- **Wrapper classes** (e.g., `Integer`, `Double`) provide methods to parse strings.
+- **Common Methods:**
+  - `Integer.parseInt(String)` → Converts to `int`
+  - `Double.parseDouble(String)` → Converts to `double`
+  - `Float.parseFloat(String)` → Converts to `float`
+- **Example:**
+  ```java
+  String x = "1";
+  int y = Integer.parseInt(x) + 2; // 3
+  ```
+- **Exception Handling:**
+  - If the string is not a valid number (e.g., `"1.1"` for `parseInt`), Java throws a `NumberFormatException`.
+
+---
+
+### **3. Math Class (java.lang.Math)**
+- Provides **static methods** for mathematical operations.
+- **Key Methods:**
+  | Method | Description | Example |
+  |--------|-------------|---------|
+  | `Math.round(float/double)` | Rounds to nearest integer | `Math.round(1.1)` → `1` |
+  | `Math.ceil(double)` | Rounds up to next integer | `Math.ceil(1.1)` → `2.0` |
+  | `Math.floor(double)` | Rounds down to previous integer | `Math.floor(1.9)` → `1.0` |
+  | `Math.max(a, b)` | Returns the greater value | `Math.max(1, 2)` → `2` |
+  | `Math.min(a, b)` | Returns the smaller value | `Math.min(1, 2)` → `1` |
+  | `Math.random()` | Returns a random `double` between `0.0` and `1.0` | `Math.random() * 100` → `0-100` |
+
+- **Example (Random Number Generation):**
+  ```java
+  double randomNum = Math.random() * 100; // 0.0 to 100.0
+  int roundedNum = (int) Math.round(randomNum); // 0 to 100
+  ```
+
+---
+
+### **4. Number Formatting (java.text.NumberFormat)**
+- Used to format numbers as **currency, percentages, etc.**
+- **Key Methods:**
+  - `NumberFormat.getCurrencyInstance()` → Formats as currency (e.g., `$1,234.56`)
+  - `NumberFormat.getPercentInstance()` → Formats as percentage (e.g., `10%`)
+- **Example (Currency Formatting):**
+  ```java
+  NumberFormat currency = NumberFormat.getCurrencyInstance();
+  String result = currency.format(1234567.891); // "$1,234,567.89"
+  ```
+- **Example (Percentage Formatting):**
+  ```java
+  NumberFormat percent = NumberFormat.getPercentInstance();
+  String result = percent.format(0.1); // "10%"
+  ```
+
+---
+
+## **Examples**
+
+### **1. Explicit Casting**
+```java
+double price = 9.99;
+int roundedPrice = (int) price; // 9 (decimal lost)
+```
+
+### **2. Parsing a String to a Number**
+```java
+String userInput = "42";
+int number = Integer.parseInt(userInput); // 42
+```
+
+### **3. Using Math.random()**
+```java
+int randomNum = (int) (Math.random() * 100); // 0 to 99
+```
+
+### **4. Formatting a Number as Currency**
+```java
+NumberFormat currency = NumberFormat.getCurrencyInstance();
+String formattedPrice = currency.format(1234.56); // "$1,234.56"
+```
+
+---
+
+## **Revision Summary**
+✅ **Implicit Casting** – Automatic when no data loss (e.g., `int` → `double`).
+✅ **Explicit Casting** – Manual when data loss occurs (e.g., `double` → `int`).
+✅ **Wrapper Classes** – Used to parse strings (e.g., `Integer.parseInt()`).
+✅ **Math Class** – Provides rounding, random numbers, max/min, etc.
+✅ **NumberFormat** – Formats numbers as currency or percentages.
+
+**Key Takeaway:**
+- Use **casting** for type conversion.
+- Use **wrapper classes** to parse strings.
+- Use **Math class** for calculations.
+- Use **NumberFormat** for user-friendly number display.
+
+=== Part 8 ===
+# **Java Programming: Refactoring, User Input, and Mortgage Calculator**
+
+---
+
+## **Key Concepts**
+- **Refactoring & Renaming Variables**
+  - Using **Shift + F6** (Mac) to rename variables and references automatically.
+  - **Method chaining** for cleaner code.
+- **User Input in Java**
+  - Using the **`Scanner`** class to read input from the terminal (`System.in`).
+  - Different **`nextX()`** methods (`nextByte()`, `nextInt()`, `nextFloat()`, `next()`, `nextLine()`).
+  - **`trim()`** method to remove leading/trailing whitespace.
+- **Mortgage Calculator Project**
+  - **Formula breakdown** for monthly mortgage payments.
+  - Using **`Math.pow()`** for exponentiation.
+  - **Avoiding magic numbers** by using constants (`final` variables).
+  - **Best practices** for variable naming and code readability.
+
+---
+
+## **Important Points**
+
+### **1. Refactoring & Renaming Variables**
+- **Shortcut for Renaming:**
+  - Press **Shift + F6** (Mac) to rename a variable and update all references automatically.
+  - Example: Renaming `numberFormat` to `percent` updates all occurrences in the code.
+
+- **Method Chaining:**
+  - Instead of storing an object in a variable, chain methods directly.
+  - Example:
+    ```java
+    // Instead of:
+    NumberFormat percent = NumberFormat.getPercentInstance();
+    String result = percent.format(0.1);
+
+    // Use method chaining:
+    String result = NumberFormat.getPercentInstance().format(0.1);
+    ```
+
+---
+
+### **2. Reading User Input with `Scanner`**
+- **Importing `Scanner`:**
+  ```java
+  import java.util.Scanner;
+  ```
+
+- **Creating a `Scanner` Object:**
+  ```java
+  Scanner scanner = new Scanner(System.in); // Reads from terminal input
+  ```
+
+- **Reading Different Data Types:**
+  | Method | Description | Example |
+  |--------|-------------|---------|
+  | `nextByte()` | Reads a byte value | `byte age = scanner.nextByte();` |
+  | `nextInt()` | Reads an integer | `int principal = scanner.nextInt();` |
+  | `nextFloat()` | Reads a float | `float rate = scanner.nextFloat();` |
+  | `nextDouble()` | Reads a double | `double value = scanner.nextDouble();` |
+  | `next()` | Reads a single word (token) | `String name = scanner.next();` |
+  | `nextLine()` | Reads an entire line | `String fullName = scanner.nextLine();` |
+
+- **Handling Whitespace with `trim()`:**
+  - Removes leading/trailing spaces from a string.
+  - Example:
+    ```java
+    String name = scanner.nextLine().trim(); // Trims extra spaces
+    ```
+
+- **Difference Between `next()` and `nextLine()`:**
+  - `next()` reads **one token** (stops at whitespace).
+  - `nextLine()` reads the **entire line** (including spaces).
+
+---
+
+### **3. Mortgage Calculator Project**
+#### **Formula for Monthly Mortgage Payment**
+\[
+M = P \times \frac{r(1 + r)^n}{(1 + r)^n - 1}
+\]
+Where:
+- \( M \) = Monthly payment
+- \( P \) = Principal loan amount
+- \( r \) = **Monthly interest rate** (annual rate ÷ 12 ÷ 100)
+- \( n \) = Number of payments (loan term in years × 12)
+
+#### **Key Steps in Implementation**
+1. **Declare Constants (Avoid Magic Numbers):**
+   ```java
+   final byte MONTHS_IN_YEAR = 12;
+   final byte PERCENT = 100;
+   ```
+
+2. **Read User Input:**
+   - Principal (as `int`).
+   - Annual interest rate (as `float`).
+   - Loan period in years (as `byte`).
+
+3. **Calculate Monthly Interest Rate:**
+   ```java
+   float monthlyInterest = annualInterest / PERCENT / MONTHS_IN_YEAR;
+   ```
+
+4. **Calculate Number of Payments:**
+   ```java
+   int numberOfPayments = years * MONTHS_IN_YEAR;
+   ```
+
+5. **Compute Mortgage Using `Math.pow()`:**
+   ```java
+   double mortgage = principal
+       * (monthlyInterest * Math.pow(1 + monthlyInterest, numberOfPayments))
+       / (Math.pow(1 + monthlyInterest, numberOfPayments) - 1);
+   ```
+
+6. **Format Output as Currency:**
+   ```java
+   String mortgageFormatted = NumberFormat.getCurrencyInstance().format(mortgage);
+   System.out.println("Mortgage: " + mortgageFormatted);
+   ```
+
+---
+
+## **Examples**
+
+### **Example 1: Renaming a Variable**
+**Before:**
+```java
+NumberFormat numberFormat = NumberFormat.getPercentInstance();
+String result = numberFormat.format(0.1);
+```
+**After (Using Shortcut):**
+```java
+NumberFormat percent = NumberFormat.getPercentInstance();
+String result = percent.format(0.1);
+```
+**After (Method Chaining):**
+```java
+String result = NumberFormat.getPercentInstance().format(0.1);
+```
+
+---
+
+### **Example 2: Reading User Input**
+```java
+Scanner scanner = new Scanner(System.in);
+
+// Read an integer (principal)
+System.out.print("Principal ($1K - $1M): ");
+int principal = scanner.nextInt();
+
+// Read a float (annual interest rate)
+System.out.print("Annual Interest Rate: ");
+float annualInterest = scanner.nextFloat();
+
+// Read a byte (loan period in years)
+System.out.print("Period (Years): ");
+byte years = scanner.nextByte();
+```
+
+---
+
+### **Example 3: Mortgage Calculation**
+```java
+final byte MONTHS_IN_YEAR = 12;
+final byte PERCENT = 100;
+
+float monthlyInterest = annualInterest / PERCENT / MONTHS_IN_YEAR;
+int numberOfPayments = years * MONTHS_IN_YEAR;
+
+double mortgage = principal
+    * (monthlyInterest * Math.pow(1 + monthlyInterest, numberOfPayments))
+    / (Math.pow(1 + monthlyInterest, numberOfPayments) - 1);
+
+String mortgageFormatted = NumberFormat.getCurrencyInstance().format(mortgage);
+System.out.println("Mortgage: " + mortgageFormatted);
+```
+**Output:**
+```
+Principal ($1K - $1M): 100000
+Annual Interest Rate: 3.92
+Period (Years): 30
+Mortgage: $472.81
+```
+
+---
+
+## **Short Revision Summary**
+
+1. **Refactoring:**
+   - Use **Shift + F6** to rename variables.
+   - **Method chaining** reduces unnecessary variables.
+
+2. **User Input (`Scanner`):**
+   - `nextByte()`, `nextInt()`, `nextFloat()`, `nextDouble()` for numbers.
+   - `next()` for single words, `nextLine()` for full lines.
+   - `trim()` removes extra whitespace.
+
+3. **Mortgage Calculator:**
+   - Formula: \( M = P \times \frac{r(1 + r)^n}{(1 + r)^n - 1} \).
+   - Use `Math.pow()` for exponentiation.
+   - Avoid **magic numbers** (use `final` constants).
+   - Format output with `NumberFormat.getCurrencyInstance()`.
+
+4. **Best Practices:**
+   - Use **descriptive variable names**.
+   - Avoid **magic numbers** (use constants).
+   - Keep code **readable and self-documenting**.
+
+---
+**Next Steps:**
+- Practice the **mortgage calculator** exercise.
+- Experiment with different `Scanner` methods.
+- Refactor code to improve readability.
+
+=== Part 9 ===
+# **Java Programming: Variables, Operators, and Control Flow**
+
+---
+
+## **Key Concepts**
+- **Variables and Constants**
+  - Primitive vs. reference types
+  - Naming conventions (camelCase)
+  - Type conversion (implicit and explicit casting)
+- **Input Handling**
+  - Reading user input from the terminal
+  - Input validation and error handling
+- **Operators**
+  - Comparison operators (`==`, `!=`, `>`, `<`, `>=`, `<=`)
+  - Logical operators (`&&`, `||`, `!`)
+- **Control Flow**
+  - Conditional statements (`if`, `else if`, `else`)
+  - Boolean expressions
+  - Mortgage calculator implementation with error handling
+
+---
+
+## **Important Points**
+
+### **1. Variables and Data Types**
+- **Primitive Types**: Store simple values (e.g., `int`, `byte`, `double`).
+  - Example: `byte age = 30;` (sufficient for small numbers).
+- **Reference Types**: Store references to complex objects (e.g., `String`, `NumberFormat`).
+- **Casting**:
+  - **Implicit Casting**: Automatic conversion (e.g., `int` to `double`).
+  - **Explicit Casting**: Manual conversion (e.g., `(int) 3.14`).
+
+### **2. Mortgage Calculator Implementation**
+- **Formula**:
+  ```
+  mortgage = principal * (monthlyInterest * (1 + monthlyInterest)^payments) / ((1 + monthlyInterest)^payments - 1)
+  ```
+- **Steps**:
+  1. Collect user input (principal, annual interest rate, loan period).
+  2. Calculate monthly interest and number of payments.
+  3. Apply the mortgage formula.
+  4. Format the result as currency using `NumberFormat`.
+
+### **3. Input Validation**
+- **Problem**: Program crashes if non-numeric or negative values are entered.
+- **Solution**: Use **conditional statements** to validate input before processing.
+
+### **4. Comparison Operators**
+- Used to compare primitive values (e.g., `x == y`, `x != y`, `x > y`).
+- **Boolean Expressions**: Produce `true` or `false` (e.g., `temperature > 30`).
+
+### **5. Logical Operators**
+- **AND (`&&`)**: Returns `true` only if **both** conditions are true.
+  - Example: `temperature > 20 && temperature < 30`.
+- **OR (`||`)**: Returns `true` if **at least one** condition is true.
+  - Example: `hasHighIncome || hasGoodCredit`.
+- **NOT (`!`)**: Reverses a boolean value.
+  - Example: `!hasCriminalRecord`.
+
+### **6. Conditional Statements (`if`, `else if`, `else`)**
+- **Syntax**:
+  ```java
+  if (condition1) {
+      // Code executes if condition1 is true
+  } else if (condition2) {
+      // Code executes if condition2 is true
+  } else {
+      // Code executes if no conditions are true
+  }
+  ```
+- **Example**:
+  ```java
+  if (temperature > 30) {
+      System.out.println("It's a hot day. Drink plenty of water.");
+  } else if (temperature >= 20 && temperature <= 30) {
+      System.out.println("It's a nice day.");
+  } else {
+      System.out.println("It's cold.");
+  }
+  ```
+
+### **7. Error Handling in Mortgage Calculator**
+- Use loops and conditionals to repeatedly prompt the user until valid input is provided.
+
+---
+
+## **Examples**
+
+### **1. Mortgage Calculation**
+```java
+double principal = 100000;
+double annualInterest = 3.92;
+int years = 30;
+
+// Calculate monthly interest and payments
+double monthlyInterest = annualInterest / 100 / 12;
+int payments = years * 12;
+
+// Mortgage formula
+double mortgage = principal * (monthlyInterest * Math.pow(1 + monthlyInterest, payments))
+                / (Math.pow(1 + monthlyInterest, payments) - 1);
+
+// Format as currency
+String mortgageFormatted = NumberFormat.getCurrencyInstance().format(mortgage);
+System.out.println("Mortgage: " + mortgageFormatted);
+```
+
+### **2. Logical Operators**
+```java
+boolean hasHighIncome = true;
+boolean hasGoodCredit = true;
+boolean hasCriminalRecord = false;
+
+// Loan eligibility rule
+boolean isEligible = (hasHighIncome || hasGoodCredit) && !hasCriminalRecord;
+System.out.println("Eligible for loan: " + isEligible); // Output: true
+```
+
+### **3. Conditional Statements**
+```java
+int temperature = 22;
+
+if (temperature > 30) {
+    System.out.println("It's a hot day.");
+} else if (temperature >= 20) {
+    System.out.println("It's a nice day.");
+} else {
+    System.out.println("It's cold.");
+}
+// Output: "It's a nice day."
+```
+
+---
+
+## **Revision Summary**
+1. **Variables and Constants**:
+   - Primitive types store simple values; reference types store object references.
+   - Use camelCase for variable names (e.g., `monthlyInterest`).
+
+2. **Mortgage Calculator**:
+   - Collect input, apply the formula, and format the result as currency.
+   - **Problem**: No input validation → crashes on invalid input.
+
+3. **Operators**:
+   - **Comparison**: `==`, `!=`, `>`, `<`, `>=`, `<=`.
+   - **Logical**: `&&` (AND), `||` (OR), `!` (NOT).
+
+4. **Control Flow**:
+   - Use `if`, `else if`, and `else` to make decisions.
+   - Combine conditions with logical operators for real-world rules.
+
+5. **Next Steps**:
+   - Add input validation to the mortgage calculator.
+   - Learn loops for repeated execution.
+
+---
+**Note**: For a deeper dive, check the instructor’s complete Java series for advanced topics and a certificate of completion.
+
+=== Part 10 ===
+# **Structured Learning Notes: Conditional Statements in Java**
+
+---
+
+## **Title: Mastering Conditional Statements in Java**
+**Topics Covered:**
+- If, else-if, and else statements
+- Simplifying boolean expressions
+- Ternary operator
+- Switch statements
+
+---
+
+## **Key Concepts**
+
+- **If-Else Statements:**
+  - Used to execute code based on boolean conditions.
+  - Can have multiple `else-if` clauses and one optional `else` clause.
+  - Braces `{}` are optional for single statements but recommended for clarity.
+
+- **Boolean Simplification:**
+  - Redundant conditions can be removed to simplify code.
+  - Proper formatting improves readability.
+
+- **Ternary Operator (`?:`):**
+  - A concise way to write simple if-else conditions.
+  - Syntax: `variable = (condition) ? valueIfTrue : valueIfFalse;`
+
+- **Switch Statements:**
+  - Used to execute different code blocks based on the value of a variable.
+  - Requires `break` statements to prevent fall-through.
+  - Supports `default` case for unmatched values.
+
+---
+
+## **Important Points**
+
+### **1. If-Else Statements**
+- **Structure:**
+  ```java
+  if (condition1) {
+      // Code if condition1 is true
+  } else if (condition2) {
+      // Code if condition2 is true
+  } else {
+      // Code if no conditions are true
+  }
+  ```
+- **Formatting Best Practices:**
+  - Avoid unnecessary braces for single statements (controversial but common).
+  - Align `else-if` and `else` clauses for symmetry:
+    ```java
+    if (condition) {
+        // Code
+    } else if (condition) {
+        // Code
+    } else {
+        // Code
+    }
+    ```
+- **Simplifying Conditions:**
+  - If `condition1` is false, subsequent conditions can be simplified.
+  - Example:
+    ```java
+    if (temperature > 30) {
+        System.out.println("Hot day");
+    } else if (temperature <= 30 && temperature > 20) {  // Redundant check
+        System.out.println("Beautiful day");
+    }
+    ```
+    Simplified to:
+    ```java
+    if (temperature > 30) {
+        System.out.println("Hot day");
+    } else if (temperature > 20) {  // No need to check <= 30
+        System.out.println("Beautiful day");
+    }
+    ```
+
+---
+
+### **2. Variable Scope in If-Else Blocks**
+- Variables declared inside a block `{}` are **scoped** to that block.
+- Example of **incorrect** scoping:
+  ```java
+  if (income > 100_000) {
+      boolean hasHighIncome = true;  // Only accessible here
+  }
+  System.out.println(hasHighIncome);  // Error: Variable not accessible
+  ```
+- **Solution:** Declare the variable outside the block:
+  ```java
+  boolean hasHighIncome = false;
+  if (income > 100_000) {
+      hasHighIncome = true;
+  }
+  ```
+
+---
+
+### **3. Simplifying Boolean Assignments**
+- **Amateur Approach:**
+  ```java
+  boolean hasHighIncome;
+  if (income > 100_000) {
+      hasHighIncome = true;
+  } else {
+      hasHighIncome = false;
+  }
+  ```
+- **Professional Approach:**
+  ```java
+  boolean hasHighIncome = (income > 100_000);  // Direct assignment
+  ```
+  - Parentheses are optional but improve readability.
+
+---
+
+### **4. Ternary Operator**
+- **Syntax:**
+  ```java
+  variable = (condition) ? valueIfTrue : valueIfFalse;
+  ```
+- **Example:**
+  ```java
+  String className = (income > 100_000) ? "First" : "Economy";
+  ```
+- **Use Case:**
+  - Best for simple if-else conditions where a variable is assigned based on a condition.
+
+---
+
+### **5. Switch Statements**
+- **Structure:**
+  ```java
+  switch (variable) {
+      case value1:
+          // Code
+          break;
+      case value2:
+          // Code
+          break;
+      default:
+          // Code if no cases match
+  }
+  ```
+- **Key Points:**
+  - `break` is required to exit the switch block (otherwise, fall-through occurs).
+  - `default` is optional but recommended for handling unexpected values.
+  - Works with `int`, `short`, `byte`, `char`, `String`, and `enum` types.
+
+- **Example:**
+  ```java
+  String role = "admin";
+  switch (role) {
+      case "admin":
+          System.out.println("You are an admin");
+          break;
+      case "moderator":
+          System.out.println("You are a moderator");
+          break;
+      default:
+          System.out.println("You are a guest");
+  }
+  ```
+
+---
+
+## **Examples**
+
+### **Example 1: If-Else Statement**
+```java
+int temperature = 25;
+if (temperature > 30) {
+    System.out.println("Hot day");
+} else if (temperature > 20) {
+    System.out.println("Beautiful day");
+} else {
+    System.out.println("Cold day");
+}
+// Output: "Beautiful day"
+```
+
+### **Example 2: Simplifying Boolean Assignment**
+```java
+int income = 120_000;
+boolean hasHighIncome = (income > 100_000);
+// hasHighIncome = true
+```
+
+### **Example 3: Ternary Operator**
+```java
+int income = 120_000;
+String className = (income > 100_000) ? "First" : "Economy";
+// className = "First"
+```
+
+### **Example 4: Switch Statement**
+```java
+int role = 1;  // 1 = admin, 2 = moderator
+switch (role) {
+    case 1:
+        System.out.println("You are an admin");
+        break;
+    case 2:
+        System.out.println("You are a moderator");
+        break;
+    default:
+        System.out.println("You are a guest");
+}
+// Output: "You are an admin"
+```
+
+---
+
+## **Short Revision Summary**
+
+1. **If-Else Statements:**
+   - Use `if`, `else-if`, and `else` to execute code based on conditions.
+   - Simplify conditions by removing redundant checks.
+   - Format code for readability (align clauses).
+
+2. **Boolean Simplification:**
+   - Directly assign boolean expressions to variables (e.g., `boolean x = (a > b);`).
+
+3. **Ternary Operator:**
+   - Use `?:` for concise if-else assignments.
+   - Syntax: `variable = (condition) ? valueIfTrue : valueIfFalse;`.
+
+4. **Switch Statements:**
+   - Use `switch` to execute code based on variable values.
+   - Always include `break` to avoid fall-through.
+   - Use `default` for unmatched cases.
+
+---
+**Final Tip:** Prefer ternary operators for simple conditions and switch statements for multiple value checks. Always prioritize readability!
+
+=== Part 11 ===
+# **Study Notes: Control Flow in Java – FizzBuzz & Loops**
+
+---
+
+## **Title:**
+**Control Flow in Java: Conditional Statements, FizzBuzz Problem, and Loops (for & while)**
+
+---
+
+## **Key Concepts**
+
+- **Conditional Statements (`if`, `else if`, `else`)** – Execute different code blocks based on boolean conditions.
+- **Modulus Operator (`%`)** – Returns the remainder of a division; used to check divisibility.
+- **DRY Principle (Don’t Repeat Yourself)** – Avoid code duplication for maintainability.
+- **Order of Conditions** – More specific conditions should be checked first to avoid logical errors.
+- **Loops** – Repeat code execution:
+  - **`for` loop** – Best when the number of iterations is known.
+  - **`while` loop** – Best when iterations depend on a dynamic condition.
+- **Nested vs. Flat Structure** – Trade-offs between readability and code duplication.
+
+---
+
+## **Important Points**
+
+### **1. The FizzBuzz Problem**
+A classic programming exercise often used in interviews:
+- **Input:** A number.
+- **Output:**
+  - "Fizz" if divisible by **5**.
+  - "Buzz" if divisible by **3**.
+  - "FizzBuzz" if divisible by **both 5 and 3**.
+  - The number itself if none of the above.
+
+#### **Common Mistake: Incorrect Condition Order**
+- If the condition for "FizzBuzz" (divisible by both 3 and 5) is not checked **first**, the program will incorrectly print "Fizz" or "Buzz" instead.
+- **Solution:** Place the most specific condition (`number % 3 == 0 && number % 5 == 0`) at the top.
+
+#### **Two Approaches to Solve FizzBuzz**
+| **Approach 1: Flat Structure (Preferred)** | **Approach 2: Nested Conditions (Less Readable)** |
+|--------------------------------------------|---------------------------------------------------|
+| Checks conditions in order of specificity. | Uses nested `if-else` to avoid repeating conditions. |
+| Cleaner and easier to read.                | Reduces code duplication but increases complexity. |
+| Slight repetition of conditions.           | Harder to maintain with deeper nesting.           |
+
+---
+
+### **2. Loops in Java**
+#### **a) `for` Loop**
+- **Syntax:**
+  ```java
+  for (initialization; condition; update) {
+      // Code to repeat
+  }
+  ```
+- **Use Case:** When the number of iterations is known (e.g., print "Hello World" 5 times).
+- **Example:**
+  ```java
+  for (int i = 0; i < 5; i++) {
+      System.out.println("Hello World " + i);
+  }
+  ```
+  - **Output:**
+    ```
+    Hello World 0
+    Hello World 1
+    Hello World 2
+    Hello World 3
+    Hello World 4
+    ```
+
+#### **b) `while` Loop**
+- **Syntax:**
+  ```java
+  while (condition) {
+      // Code to repeat
+  }
+  ```
+- **Use Case:** When iterations depend on a dynamic condition (e.g., user input).
+- **Example:**
+  ```java
+  Scanner scanner = new Scanner(System.in);
+  String input = "";
+  while (!input.equals("quit")) {
+      System.out.print("Enter a command: ");
+      input = scanner.nextLine();
+  }
+  ```
+  - **Behavior:** Keeps asking for input until the user types "quit".
+
+#### **Key Differences**
+| Feature          | `for` Loop                          | `while` Loop                        |
+|------------------|-------------------------------------|-------------------------------------|
+| **Initialization** | Inside the loop declaration.       | Outside the loop.                   |
+| **Update**       | Inside the loop declaration.       | Inside the loop body.               |
+| **Best For**     | Known iterations.                  | Dynamic conditions.                 |
+
+---
+
+## **Examples**
+
+### **1. FizzBuzz Solution (Flat Structure)**
+```java
+import java.util.Scanner;
+
+public class FizzBuzz {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Number: ");
+        int number = scanner.nextInt();
+
+        if (number % 3 == 0 && number % 5 == 0) {
+            System.out.println("FizzBuzz");
+        } else if (number % 5 == 0) {
+            System.out.println("Fizz");
+        } else if (number % 3 == 0) {
+            System.out.println("Buzz");
+        } else {
+            System.out.println(number);
+        }
+    }
+}
+```
+
+### **2. Printing Numbers in Reverse Using `for` Loop**
+```java
+for (int i = 5; i > 0; i--) {
+    System.out.println("Hello World " + i);
+}
+```
+- **Output:**
+  ```
+  Hello World 5
+  Hello World 4
+  Hello World 3
+  Hello World 2
+  Hello World 1
+  ```
+
+### **3. User Input Loop Using `while`**
+```java
+Scanner scanner = new Scanner(System.in);
+String input = "";
+while (!input.equals("quit")) {
+    System.out.print("Enter a command (or 'quit' to exit): ");
+    input = scanner.nextLine();
+    System.out.println("You entered: " + input);
+}
+```
+- **Behavior:** Repeats until the user types "quit".
+
+---
+
+## **Short Revision Summary**
+
+1. **FizzBuzz Problem:**
+   - Check divisibility by **3**, **5**, or **both** in the correct order.
+   - **Flat structure (preferred)** is cleaner than nested conditions.
+
+2. **Loops:**
+   - **`for` loop:** Use when iterations are known (e.g., `for (int i = 0; i < 5; i++)`).
+   - **`while` loop:** Use for dynamic conditions (e.g., `while (!input.equals("quit"))`).
+
+3. **Key Takeaways:**
+   - **Order matters** in `if-else` conditions (specific first).
+   - **DRY Principle** avoids repetition but can lead to nested code.
+   - **Trade-offs** exist in programming—choose readability over minor optimizations.
+
+---
+**Next Steps:**
+- Practice writing loops for different scenarios (e.g., counting, user input).
+- Experiment with nested loops and loop control statements (`break`, `continue`).
+
+=== Part 12 ===
+# **Java Loops and Input Handling: Study Notes**
+
+---
+
+## **Title**
+**Java Loops, Input Validation, and Control Flow**
+
+---
+
+## **Key Concepts**
+- **String Comparison**: Use `.equals()` instead of `==` to compare string values.
+- **Loop Types**:
+  - `while` loop: checks condition before execution.
+  - `do-while` loop: executes at least once, checks condition after.
+  - `for` loop: used for known iteration counts.
+  - `for-each` loop: simplified iteration over arrays/collections.
+- **Loop Control Statements**:
+  - `break`: exits the loop immediately.
+  - `continue`: skips to the next iteration.
+- **Infinite Loops**: Use `while(true)` with a `break` condition.
+- **Input Validation**: Use loops to repeatedly prompt the user until valid input is received.
+- **Scanner Best Practices**: Declare `Scanner` once outside loops to avoid memory issues.
+
+---
+
+## **Important Points**
+
+### **1. String Comparison and Input Handling**
+- **`.equals()` Method**:
+  - Use `input.equals("quit")` instead of `input == "quit"` to compare string values.
+  - The `==` operator compares memory addresses, not content.
+- **Case Insensitivity**:
+  - Convert input to lowercase using `.toLowerCase()` to handle mixed-case inputs (e.g., "Quit", "QUIT").
+  - Example: `input = scanner.next().toLowerCase();`
+- **Scanner Object**:
+  - Declare the `Scanner` object **once** outside the loop to avoid memory pollution.
+  - Example:
+    ```java
+    Scanner scanner = new Scanner(System.in);
+    while (!input.equals("quit")) {
+        input = scanner.next().toLowerCase();
+    }
+    ```
+
+---
+
+### **2. Loop Types and Use Cases**
+
+#### **While Loop**
+- **Syntax**:
+  ```java
+  while (condition) {
+      // code to execute
+  }
+  ```
+- **Behavior**:
+  - Checks the condition **before** executing the loop body.
+  - If the condition is `false` initially, the loop never runs.
+- **Use Case**:
+  - Ideal when the number of iterations is **unknown** (e.g., user input loops).
+
+#### **Do-While Loop**
+- **Syntax**:
+  ```java
+  do {
+      // code to execute
+  } while (condition);
+  ```
+- **Behavior**:
+  - Executes the loop body **at least once** before checking the condition.
+  - Useful for menus or prompts where the user must enter input at least once.
+- **Use Case**:
+  - Rarely used, but helpful when the loop must run **at least once** (e.g., game loops, input validation).
+
+#### **For Loop**
+- **Syntax**:
+  ```java
+  for (initialization; condition; update) {
+      // code to execute
+  }
+  ```
+- **Use Case**:
+  - Best for **known iteration counts** (e.g., iterating over arrays, counting loops).
+  - Example:
+    ```java
+    for (int i = 0; i < fruits.length; i++) {
+        System.out.println(fruits[i]);
+    }
+    ```
+
+#### **For-Each Loop**
+- **Syntax**:
+  ```java
+  for (dataType item : array/collection) {
+      // code to execute
+  }
+  ```
+- **Behavior**:
+  - Simplifies iteration over arrays/collections.
+  - **Limitations**:
+    - Forward-only (cannot iterate backward).
+    - No access to the index of the current item.
+- **Use Case**:
+  - Ideal for reading all elements in an array/collection without needing the index.
+  - Example:
+    ```java
+    for (String fruit : fruits) {
+        System.out.println(fruit);
+    }
+    ```
+
+---
+
+### **3. Loop Control Statements**
+
+#### **Break Statement**
+- **Purpose**: Exits the loop immediately.
+- **Use Case**:
+  - Terminate a loop when a condition is met (e.g., user enters "quit").
+  - Example:
+    ```java
+    while (true) {
+        String input = scanner.next();
+        if (input.equals("quit")) {
+            break; // Exit the loop
+        }
+        System.out.println(input);
+    }
+    ```
+
+#### **Continue Statement**
+- **Purpose**: Skips the current iteration and moves to the next one.
+- **Use Case**:
+  - Skip specific values (e.g., ignore "pass" in user input).
+  - Example:
+    ```java
+    while (!input.equals("quit")) {
+        input = scanner.next();
+        if (input.equals("pass")) {
+            continue; // Skip printing "pass"
+        }
+        System.out.println(input);
+    }
+    ```
+
+---
+
+### **4. Infinite Loops**
+- **Syntax**: `while (true)`
+- **Use Case**:
+  - Common in input validation where the loop runs until a valid input is received.
+  - **Must include a `break` statement** to avoid infinite execution.
+- **Example**:
+  ```java
+  while (true) {
+      System.out.print("Enter a number (1000-1000000): ");
+      int principal = scanner.nextInt();
+      if (principal >= 1000 && principal <= 1000000) {
+          break; // Valid input, exit loop
+      }
+      System.out.println("Invalid input. Try again.");
+  }
+  ```
+
+---
+
+### **5. Input Validation**
+- **Purpose**: Ensure user input meets specific criteria (e.g., range, type).
+- **Approach**:
+  - Use an **infinite loop** (`while(true)`) to repeatedly prompt the user.
+  - Validate input inside the loop and `break` if valid.
+- **Example**:
+  ```java
+  while (true) {
+      System.out.print("Enter principal ($1K-$1M): ");
+      int principal = scanner.nextInt();
+      if (principal >= 1000 && principal <= 1000000) {
+          break;
+      }
+      System.out.println("Enter a value between 1,000 and 1,000,000.");
+  }
+  ```
+
+---
+
+## **Examples**
+
+### **Example 1: While Loop for User Input**
+```java
+Scanner scanner = new Scanner(System.in);
+String input = "";
+
+while (!input.equals("quit")) {
+    System.out.print("Input: ");
+    input = scanner.next().toLowerCase();
+    if (!input.equals("quit")) {
+        System.out.println("Echo: " + input);
+    }
+}
+```
+
+### **Example 2: Do-While Loop for Input Validation**
+```java
+Scanner scanner = new Scanner(System.in);
+String input;
+
+do {
+    System.out.print("Input (type 'quit' to exit): ");
+    input = scanner.next().toLowerCase();
+    System.out.println("Echo: " + input);
+} while (!input.equals("quit"));
+```
+
+### **Example 3: For Loop to Iterate Over an Array**
+```java
+String[] fruits = {"Apple", "Mango", "Orange"};
+
+for (int i = 0; i < fruits.length; i++) {
+    System.out.println(fruits[i]);
+}
+```
+
+### **Example 4: For-Each Loop**
+```java
+String[] fruits = {"Apple", "Mango", "Orange"};
+
+for (String fruit : fruits) {
+    System.out.println(fruit);
+}
+```
+
+### **Example 5: Input Validation with Infinite Loop**
+```java
+Scanner scanner = new Scanner(System.in);
+int principal;
+
+while (true) {
+    System.out.print("Enter principal ($1K-$1M): ");
+    principal = scanner.nextInt();
+    if (principal >= 1000 && principal <= 1000000) {
+        break;
+    }
+    System.out.println("Invalid input. Try again.");
+}
+```
+
+---
+
+## **Short Revision Summary**
+
+1. **String Comparison**:
+   - Use `.equals()` for content comparison, not `==`.
+   - Convert input to lowercase for case-insensitive checks.
+
+2. **Loops**:
+   - `while`: checks condition first; use for unknown iterations.
+   - `do-while`: runs at least once; use for menus/prompts.
+   - `for`: use for known iteration counts.
+   - `for-each`: simplified iteration over arrays/collections (forward-only, no index access).
+
+3. **Loop Control**:
+   - `break`: exits the loop.
+   - `continue`: skips to the next iteration.
+
+4. **Infinite Loops**:
+   - Use `while(true)` with a `break` condition for input validation.
+
+5. **Input Validation**:
+   - Use loops to repeatedly prompt the user until valid input is received.
+   - Declare `Scanner` once outside loops to avoid memory issues.
+
+6. **Best Practices**:
+   - Avoid creating multiple `Scanner` objects in loops.
+   - Use underscores in large numbers for readability (e.g., `1_000_000`).
+
+=== Part 13 ===
+# **Structured Study Notes: Java Programming - Data Validation & Clean Code**
+
+---
+
+## **Title: Data Validation, Control Flow, and Clean Coding in Java**
+
+---
+
+## **Key Concepts**
+- Variable scope and block-level declarations
+- Data validation using loops and conditional statements
+- Compilation errors due to incorrect variable scope
+- Refactoring code for better readability and maintainability
+- Comparison and logical operators
+- Types of control flow statements:
+  - Conditional statements (`if`, `switch`)
+  - Loops (`for`, `while`, `do-while`, `for-each`)
+  - `break` and `continue` statements
+- Importance of writing clean, human-readable code
+
+---
+
+## **Important Points**
+
+### **1. Variable Scope and Compilation Errors**
+- Variables declared inside a block (e.g., within `{ }`) are **scoped to that block** and **not accessible outside** of it.
+- Example: If `principal` is declared inside a `while` loop, it cannot be used outside the loop, causing a **"cannot resolve symbol"** compilation error.
+- **Solution**: Declare variables **outside the loop** (e.g., at the beginning of the method) to ensure they are accessible throughout the method.
+
+### **2. Data Validation Using Infinite Loops**
+- Use an **infinite loop** (`while (true)`) to repeatedly prompt the user until valid input is provided.
+- Validate input using **conditional statements** (`if-else`).
+- If input is valid:
+  - Perform calculations (e.g., convert annual interest to monthly interest).
+  - **Break out of the loop** using `break`.
+- If input is invalid:
+  - Print an **error message** and **repeat the loop**.
+
+### **3. Example of Data Validation for Mortgage Calculator**
+- **Principal Amount**: Must be between 1,000 and 1,000,000.
+- **Annual Interest Rate**: Must be between 1% and 30%.
+- **Loan Period (Years)**: Must be between 1 and 30 years.
+
+### **4. Refactoring for Clean Code**
+- Long methods with many statements are **hard to read and maintain**.
+- **Solution**: Break down code into **smaller, reusable chunks** (e.g., separate methods for input validation, calculations, and output).
+- Follow **Martin Fowler’s principle**:
+  > *"Any fool can write code that a computer can understand. Good programmers write code that humans can understand."*
+
+### **5. Control Flow Statements**
+| **Type**               | **Purpose**                                                                 | **Examples**                          |
+|------------------------|-----------------------------------------------------------------------------|---------------------------------------|
+| **Conditional**        | Make decisions in code based on conditions.                                | `if`, `else`, `switch`                |
+| **Loops**              | Execute code repeatedly.                                                   | `for`, `while`, `do-while`, `for-each`|
+| **Jump Statements**    | Control loop execution (exit or skip iterations).                          | `break`, `continue`                   |
+
+### **6. Comparison and Logical Operators**
+- **Comparison Operators**: `==`, `!=`, `>`, `<`, `>=`, `<=`
+- **Logical Operators**: `&&` (AND), `||` (OR), `!` (NOT)
+- Used to **combine conditions** (e.g., `if (interest >= 1 && interest <= 30)`).
+
+---
+
+## **Examples**
+
+### **Example 1: Fixing Variable Scope Error**
+**Problem**:
+```java
+while (true) {
+    int principal = scanner.nextInt(); // Declared inside loop
+    if (principal >= 1000 && principal <= 1_000_000) break;
+    System.out.println("Enter a value between 1,000 and 1,000,000");
+}
+// Error: "principal" cannot be resolved outside the loop
+```
+
+**Solution**:
+```java
+int principal = 0; // Declare outside the loop
+while (true) {
+    principal = scanner.nextInt();
+    if (principal >= 1000 && principal <= 1_000_000) break;
+    System.out.println("Enter a value between 1,000 and 1,000,000");
+}
+```
+
+---
+
+### **Example 2: Data Validation for Annual Interest**
+```java
+float annualInterest = 0;
+while (true) {
+    annualInterest = scanner.nextFloat();
+    if (annualInterest >= 1 && annualInterest <= 30) {
+        float monthlyInterest = annualInterest / 100 / 12; // Calculate monthly interest
+        break;
+    }
+    System.out.println("Enter a value between 1 and 30");
+}
+```
+
+---
+
+### **Example 3: Refactoring for Clean Code**
+**Before (Messy Code)**:
+```java
+public static void main(String[] args) {
+    // Long method with nested loops and conditionals
+    int principal = 0;
+    while (true) { /* ... */ }
+    float annualInterest = 0;
+    while (true) { /* ... */ }
+    int years = 0;
+    while (true) { /* ... */ }
+    // Mortgage calculation logic...
+}
+```
+
+**After (Clean Code)**:
+```java
+public static void main(String[] args) {
+    int principal = readNumber("Principal ($1K - $1M): ", 1000, 1_000_000);
+    float annualInterest = readNumber("Annual Interest Rate: ", 1, 30);
+    int years = readNumber("Period (Years): ", 1, 30);
+    printMortgage(principal, annualInterest, years);
+}
+
+public static int readNumber(String prompt, int min, int max) {
+    Scanner scanner = new Scanner(System.in);
+    int value;
+    while (true) {
+        System.out.print(prompt);
+        value = scanner.nextInt();
+        if (value >= min && value <= max) break;
+        System.out.println("Enter a value between " + min + " and " + max);
+    }
+    return value;
+}
+```
+
+---
+
+## **Short Revision Summary**
+
+1. **Variable Scope**:
+   - Variables declared inside a block (e.g., `while` loop) are **not accessible outside**.
+   - Declare variables **outside loops** if they need to be used later.
+
+2. **Data Validation**:
+   - Use **infinite loops** (`while (true)`) to repeatedly prompt for input.
+   - Validate input with **conditional statements** (`if-else`).
+   - Use `break` to exit the loop when input is valid.
+
+3. **Clean Code Principles**:
+   - Avoid **long methods** with many statements.
+   - Break code into **smaller, reusable methods**.
+   - Write code that is **easy for humans to read and understand**.
+
+4. **Control Flow**:
+   - **Conditional Statements**: `if`, `switch` (for decisions).
+   - **Loops**: `for`, `while`, `do-while`, `for-each` (for repetition).
+   - **Jump Statements**: `break`, `continue` (to control loops).
+
+5. **Key Takeaway**:
+   - Good code is **not just functional**—it is **readable, maintainable, and clean**.
+
+---
+**Next Steps**:
+- Practice refactoring messy code into clean, modular functions.
+- Experiment with different control flow statements in Java.
+- Explore more advanced clean coding techniques (e.g., design patterns, SOLID principles).
