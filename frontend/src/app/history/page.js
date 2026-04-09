@@ -94,9 +94,14 @@ export default function HistoryPage() {
         <Link href="/" className="text-2xl font-extrabold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent select-none">
           LearnTube
         </Link>
-        <Link href="/" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
-          ← Back to home
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/certificates" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+            🎓 My Certificates
+          </Link>
+          <Link href="/" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
+            ← Back to home
+          </Link>
+        </div>
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 py-10">
@@ -160,13 +165,21 @@ export default function HistoryPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <Link
                       href={resumeUrl}
                       className="text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg transition-colors"
                     >
                       {pct === 100 ? 'Review' : 'Resume'}
                     </Link>
+                    {pct === 100 && (
+                      <Link
+                        href={`/exam?url=${encodeURIComponent(item.videoUrl)}`}
+                        className="text-sm font-medium bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white px-4 py-1.5 rounded-lg transition-opacity"
+                      >
+                        🎓 Take Exam
+                      </Link>
+                    )}
                     <a
                       href={item.videoUrl}
                       target="_blank"

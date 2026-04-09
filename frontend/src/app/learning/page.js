@@ -459,13 +459,34 @@ export default function LearningPage() {
 
   const { videoSource } = courseData;
   const currentProgress = calculateProgress();
+  const allLessonsComplete = lessons.length > 0 && lessons.every(l => l.completed);
 
   return (
     <div className={`font-inter transition-colors duration-300 ${isDarkTheme ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-      <NavigationBar 
-        isDarkTheme={isDarkTheme} 
+      <NavigationBar
+        isDarkTheme={isDarkTheme}
         setIsDarkTheme={setIsDarkTheme}
       />
+
+      {/* Take Exam Banner */}
+      {allLessonsComplete && courseUrl && (
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-6 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🎓</span>
+            <div>
+              <p className="font-semibold text-sm">You've completed all lessons!</p>
+              <p className="text-indigo-100 text-xs">Take the proficiency exam to earn your certificate.</p>
+            </div>
+          </div>
+          <a
+            href={`/exam?url=${encodeURIComponent(courseUrl)}`}
+            className="flex-shrink-0 bg-white text-indigo-700 font-bold text-sm px-5 py-2 rounded-xl hover:bg-indigo-50 transition-colors shadow-md"
+          >
+            Take Exam →
+          </a>
+        </div>
+      )}
+
       <div className="flex">
         <LessonContent
           selectedLesson={selectedLesson}
