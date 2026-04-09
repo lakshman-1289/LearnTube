@@ -35,3 +35,12 @@ ffmpeg-python>=0.2.0
 
 # Database
 motor>=3.3.2
+pymongo>=4.6.0
+
+# Auth (JWT + bcrypt + email validation)
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+pydantic[email]>=2.5.0
+
+# Certificate PDF (optional — install manually if needed)
+# reportlab>=4.0.0

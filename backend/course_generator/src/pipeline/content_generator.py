@@ -71,10 +71,10 @@ class ContentGenerator:
         json_text = await safe_groq_request(
             prompt=strict_prompt,
             model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
-            max_tokens=500,
+            max_tokens=900,
             temperature=0.2,
-            token_limit=2000,
-            stage_context=f"generate_lesson_{lesson_title}" ,
+            token_limit=2500,
+            stage_context=f"generate_lesson_{lesson_title}",
         )
 
         try:
@@ -89,7 +89,56 @@ class ContentGenerator:
         
         try:
             validated = LessonContent(**normalized)
-            print(f"✅ [CONTENT_GEN] Success. Lesson Content validated perfectly after Python normalization.")
+            # Content quality validation
+            if not self._is_valid_content(validated):
+                print(f"⚠️ [CONTENT_GEN] Low-quality content detected. Retrying once...")
+                return await self._retry_generate_lesson_content(lesson_title, lesson_subtitle, strict_prompt)
+            print(f"✅ [CONTENT_GEN] Success. Lesson Content validated.")
             return validated
         except ValidationError as ve:
             raise RuntimeError(f"Validation inherently failed despite normalization: {ve}\nNORMD: {normalized}")
+
+    def _is_valid_content(self, content: LessonContent) -> bool:
+        """Validates lesson content meets minimum quality standards."""
+        # Introduction must have at least 50 chars (roughly 2-3 sentences)
+        if not content.introduction or len(content.introduction.strip()) < 50:
+            print(f"⚠️ [CONTENT_GEN] Invalid: introduction too short ({len(content.introduction.strip()) if content.introduction else 0} chars)")
+            return False
+        # Must have at least 2 sections
+        if len(content.sections) < 2:
+            print(f"⚠️ [CONTENT_GEN] Invalid: only {len(content.sections)} section(s)")
+            return False
+        # Each section must have at least 2 points
+        for i, section in enumerate(content.sections):
+            if len(section.points) < 2:
+                print(f"⚠️ [CONTENT_GEN] Invalid: section {i} has only {len(section.points)} point(s)")
+                return False
+        return True
+
+    async def _retry_generate_lesson_content(self, lesson_title: str, lesson_subtitle: str, original_prompt: str) -> LessonContent:
+        """Single retry with a reinforced prompt."""
+        retry_prompt = (
+            "IMPORTANT: The previous response was rejected for low quality.\n"
+            "You MUST include:\n"
+            "- introduction: at least 2 full sentences\n"
+            "- at least 2 sections\n"
+            "- at least 2 points per section\n\n"
+        ) + original_prompt
+
+        json_text = await safe_groq_request(
+            prompt=retry_prompt,
+            model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
+            max_tokens=900,
+            temperature=0.3,
+            token_limit=2500,
+            stage_context=f"retry_lesson_{lesson_title}",
+        )
+        try:
+            parsed = clean_llm_json(json_text)
+        except Exception:
+            parsed = {}
+        normalized = normalize_lesson(parsed)
+        try:
+            return LessonContent(**normalized)
+        except ValidationError as ve:
+            raise RuntimeError(f"Retry also failed validation: {ve}")

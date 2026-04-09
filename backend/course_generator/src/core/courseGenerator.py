@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 from course_generator.src.core.groq_client import GroqClient
 from course_generator.src.pipeline.topic_extractor import TopicExtractor
 from course_generator.src.pipeline.lesson_planner import LessonPlanner
@@ -14,24 +14,44 @@ class CourseGenerator:
     """
     def __init__(self, groq_client: GroqClient):
         self.client = groq_client
-        
+
         # Initialize specialized agents
         self.topic_extractor = TopicExtractor(self.client)
         self.lesson_planner = LessonPlanner(self.client)
         self.content_generator = ContentGenerator(self.client)
         self.quiz_generator = QuizGenerator(self.client)
-        
+
+    @staticmethod
+    def _get_target_lesson_range(transcript_text: str) -> Tuple[int, int]:
+        """
+        Returns (min_lessons, max_lessons) based on transcript word count.
+        < 2000 words  → 1–2 lessons
+        2000–6000     → 2–4 lessons
+        6000+         → 4–6 lessons
+        """
+        word_count = len(transcript_text.split())
+        print(f"[PIPELINE] 📏 Transcript word count: {word_count}")
+        if word_count < 2000:
+            return 1, 2
+        elif word_count < 6000:
+            return 2, 4
+        else:
+            return 4, 6
+
     async def generate_complete_course(self, transcript_text: str, video_title: str, video_url: str = "original_video_url") -> Dict:
         """
         Coordinates the pipeline execution and returns dict mapping to FinalCourse JSON format.
         """
         try:
+            min_lessons, max_lessons = self._get_target_lesson_range(transcript_text)
+            print(f"[PIPELINE] 🎯 Target lesson range: {min_lessons}–{max_lessons}")
+
             print("[PIPELINE] 🚀 Starting Topic Extraction...")
             topics = await self.topic_extractor.extract_topics(transcript_text)
             print(f"[PIPELINE] ✅ Extracted {len(topics.topics)} topics.")
-            
+
             print("[PIPELINE] 🗓️ Planning Lessons...")
-            lesson_plan = await self.lesson_planner.plan_lessons(topics)
+            lesson_plan = await self.lesson_planner.plan_lessons(topics, min_lessons=min_lessons, max_lessons=max_lessons)
             print(f"[PIPELINE] ✅ Planned {len(lesson_plan.lessons)} lessons.")
             
             from course_generator.src.pipeline.chunking_service import chunking_service

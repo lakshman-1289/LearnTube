@@ -266,7 +266,12 @@ def normalize_lesson(data: dict) -> dict:
 
     if not isinstance(data, dict):
         print("[LLM_NORMALIZE] normalize_lesson: input was not an object; coercing")
-        data = {}
+        if isinstance(data, list):
+            # LLM returned just the sections array — recover what we can
+            print("[LLM_NORMALIZE] Input is a list — treating as sections array")
+            data = {"sections": data}
+        else:
+            data = {}
 
     lesson_title = data.get("lessonTitle") or data.get("lesson_title") or data.get("title") or data.get("name") or ""
     introduction = data.get("introduction") or data.get("intro") or data.get("summary") or data.get("lessonSubtitle") or ""

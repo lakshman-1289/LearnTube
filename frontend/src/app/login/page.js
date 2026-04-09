@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -10,66 +10,56 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const handleCredentialsSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-    });
-    if (result.error) {
-      setError(result.error);
+    setError('');
+    setLoading(true);
+    const result = await signIn('credentials', { redirect: false, email, password });
+    setLoading(false);
+    if (result?.error) {
+      setError('Invalid email or password. Please try again.');
     } else {
-      router.push('/');
+      router.push(callbackUrl);
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    await signIn('google', { callbackUrl: '/' });
-  };
+  const handleGoogle = () => signIn('google', { callbackUrl });
 
   return (
-    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
-      <div className="bg-[#161b22] text-white rounded-lg shadow-lg w-full max-w-md p-8">
-        <div className="flex justify-center mb-6">
-          <svg
-            height="32"
-            className="fill-white"
-            viewBox="0 0 16 16"
-            width="32"
-            aria-hidden="true"
-          >
-            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 
-            0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
-            -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 
-            2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 
-            0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 
-            2.2.82a7.54 7.54 0 012 0c1.53-1.03 2.2-.82 2.2-.82.44 
-            1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 
-            0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 
-            0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 
-            8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
-          </svg>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full max-w-md p-8">
+
+        {/* LearnTube Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
+            LearnTube
+          </div>
+          <p className="text-sm text-gray-500">Your AI-powered learning platform</p>
         </div>
-        <h2 className="text-2xl font-semibold text-center mb-4">Sign in to Learning platform</h2>
-        <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+
+        <h2 className="text-xl font-semibold text-gray-900 text-center mb-6">Sign in to your account</h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-gray-300">Username or email address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
             <input
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full p-3 bg-[#0d1117] border border-[#30363d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               placeholder="you@example.com"
               required
             />
           </div>
           <div>
-            <div className="flex justify-between items-center">
-              <label className="text-sm text-gray-300">Password</label>
-              <Link href="/forgot-password" className="text-blue-500 text-sm hover:underline">
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
                 Forgot password?
               </Link>
             </div>
@@ -77,42 +67,47 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full p-3 bg-[#0d1117] border border-[#30363d] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               placeholder="••••••••"
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+          {error && (
+            <p className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-lg py-2 px-3">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition duration-300"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2.5 rounded-lg transition-colors text-sm"
           >
-            Sign in
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <div className="my-4 flex items-center justify-center">
-          <div className="border-t border-gray-600 w-full"></div>
-          <span className="mx-3 text-sm text-gray-400">or</span>
-          <div className="border-t border-gray-600 w-full"></div>
+        <div className="my-5 flex items-center gap-3">
+          <div className="flex-1 border-t border-gray-200" />
+          <span className="text-xs text-gray-400">or</span>
+          <div className="flex-1 border-t border-gray-200" />
         </div>
 
         <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center gap-2 bg-white text-black py-2 rounded-md hover:bg-gray-100 transition"
+          onClick={handleGoogle}
+          className="w-full flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition-colors text-sm"
         >
-          <FcGoogle size={20} />
+          <FcGoogle size={18} />
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-sm text-gray-400">
-          New to Platform?{' '}
-          <Link href="/signup" className="text-blue-500 hover:underline">
-            Create an account
+        <p className="mt-6 text-center text-sm text-gray-500">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            Sign up
           </Link>
         </p>
-
-       
       </div>
     </div>
   );

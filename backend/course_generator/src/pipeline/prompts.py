@@ -23,7 +23,7 @@ Convert the following extracted topics into structured lesson plans.
 
 ### ⚠️ Rules
 1. Create a clear, engaging title and subtitle for each lesson.
-2. Make sure the lesson count equals the topic count (or merges smoothly).
+2. IMPORTANT: Generate BETWEEN {min_lessons} and {max_lessons} lessons ONLY. Merge or group topics if needed.
 3. Do not generate the actual content yet, just the outline mapping the `title`, `subtitle`, and `videoMeta`.
 4. Return strictly valid JSON formatted to the `LessonPlan` schema.
 
@@ -40,15 +40,16 @@ Generate detailed, comprehensive, and engaging lesson content for the topic: "{l
 ### ⚠️ Rules
 1. Use the provided transcript segment as ground truth. Do not hallucinate outside facts.
 2. Structure the content strictly into:
-   - introduction (1-2 paragraphs)
-   - sections (Mix of 'concept' and 'example' types)
-   - conclusion (Short summary)
-3. For each section, provide specific points with subtitles and detailed explanations.
-4. If a concept is abstract, follow it with an 'example' section to provide real-world context.
-5. All text MUST be generated in CLEAR ENGLISH, regardless of original language.
-6. Return strictly valid JSON formatted to the `LessonContent` schema.
+   - introduction: 2–3 full sentences explaining what the lesson covers
+   - sections: AT LEAST 2 sections mixing 'concept' and 'example' types
+   - conclusion: Short 1–2 sentence summary
+3. Each section MUST have AT LEAST 2 points with subtitles and detailed explanations (min 1 sentence each).
+4. If a concept is abstract, follow it with an 'example' section with real-world context.
+5. All text MUST be in CLEAR ENGLISH regardless of original language.
+6. NEVER produce empty introduction, sections, or points. Always provide substantive content.
+7. Return strictly valid JSON formatted to the `LessonContent` schema.
 
-### 📦 Topic Context & Constraints:
+### 📦 Topic Context:
 Lesson Subtitle: {lesson_subtitle}
 
 ### 📦 Source Transcript Segment:
@@ -59,15 +60,17 @@ Lesson Subtitle: {lesson_subtitle}
 You are an expert educational evaluator.
 
 ### 🎯 Goal
-Generate multiple-choice questions (MCQs) to test understanding of the following lesson content.
+Generate exactly 3 multiple-choice questions to test understanding of the lesson content below.
 
 ### ⚠️ Rules
-1. Generate exactly 3 questions.
-2. Mix question types: 1 conceptual (why/how), 1 scenario-based, 1 tricky/misconception.
-3. Each question MUST have exactly 4 options.
-4. Specify the `correctAnswer` strictly as an integer index (0-3).
-5. Provide a detailed explanation for why the answer is correct.
-6. Return strictly valid JSON array of `Quiz` objects format.
+1. Generate EXACTLY 3 questions — no more, no less.
+2. Mix types: Q1 = conceptual (why/how), Q2 = scenario-based application, Q3 = tricky/common-misconception.
+3. Each question MUST have EXACTLY 4 answer options (no duplicates).
+4. `correctAnswer` MUST be an integer index 0–3 matching the correct option.
+5. `answer` MUST be the exact text of the correct option string.
+6. `explanation` must clearly explain why the answer is correct and why the others are wrong.
+7. All questions must be answerable from the lesson content alone.
+8. Return ONLY valid JSON, no markdown, no extra text.
 
 ### 📦 Lesson Content:
 {lesson_content}

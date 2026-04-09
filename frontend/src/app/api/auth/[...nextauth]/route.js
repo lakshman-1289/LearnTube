@@ -59,8 +59,10 @@ export const authOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Always redirect to /learning after login
-      return baseUrl + "/learning";
+      // Respect explicit callbackUrl if it's on the same origin
+      if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith('/')) return baseUrl + url;
+      return baseUrl;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

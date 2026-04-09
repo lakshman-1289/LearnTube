@@ -1,6 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import NavigationBar from "@/components/learning/NavigationBar";
 import LessonContent from "@/components/learning/LessonContent";
 import CourseSidebar from "@/components/learning/CourseSidebar";
@@ -10,11 +11,12 @@ import ErrorDisplay from "@/components/common/ErrorDisplay";
 export default function LearningPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [lessonType, setLessonType] = useState("video");
-  const [showQuiz, setShowQuiz] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState('Starting...');
   const [error, setError] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [selectedLessonId, setSelectedLessonId] = useState(null);
@@ -48,29 +50,121 @@ export default function LearningPage() {
       setLoading(true);
       setError(null);
 
+      const storageKey = `lt_job_${courseUrl}`;
+
       try {
-        const response = await fetch('/api/generate-learning-content', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ url: courseUrl }),
-        });
+        // Step 1: Reuse existing job if available (e.g. after a frontend timeout → Try Again)
+        let jobId = sessionStorage.getItem(storageKey);
 
-        const result = await response.json();
+        if (jobId) {
+          setLoadingMessage('Resuming course generation...');
+        } else {
+          // Start a fresh async job — returns immediately with job_id
+          setLoadingMessage('Analysing video...');
+          const startRes = await fetch('/api/generate-learning-content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: courseUrl }),
+          });
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to generate course content');
+          const startData = await startRes.json();
+          if (!startRes.ok) {
+            throw new Error(startData.error || 'Failed to start course generation');
+          }
+
+          jobId = startData.job_id;
+          if (!jobId) throw new Error('No job ID returned from backend');
+          sessionStorage.setItem(storageKey, jobId);
         }
 
+        // Step 2: Poll until complete
+        const POLL_INTERVAL = 5000; // 5 seconds
+        const MAX_WAIT = 10 * 60 * 1000; // 10 minutes
+        const started = Date.now();
+
+        const messages = [
+          'Extracting transcript...',
+          'Generating course outline...',
+          'Writing lesson content...',
+          'Creating quizzes...',
+          'Assembling course...',
+          'Almost done...',
+        ];
+        let msgIndex = 0;
+
+        const result = await new Promise((resolve, reject) => {
+          const interval = setInterval(async () => {
+            // Cycle loading messages for better UX
+            setLoadingMessage(messages[msgIndex % messages.length]);
+            msgIndex++;
+
+            if (Date.now() - started > MAX_WAIT) {
+              clearInterval(interval);
+              reject(new Error('Course generation timed out. Please try again.'));
+              return;
+            }
+
+            try {
+              const pollRes = await fetch(`/api/course-status/${jobId}`);
+              const pollData = await pollRes.json();
+
+              if (pollData.status === 'completed') {
+                clearInterval(interval);
+                sessionStorage.removeItem(storageKey);
+                resolve(pollData.data);
+              } else if (pollData.status === 'failed') {
+                clearInterval(interval);
+                sessionStorage.removeItem(storageKey);
+                reject(new Error(pollData.error || 'Course generation failed'));
+              } else if (pollRes.status === 500) {
+                // Backend is unreachable or crashed — stop polling immediately
+                clearInterval(interval);
+                sessionStorage.removeItem(storageKey);
+                reject(new Error(pollData.error || 'Backend server is unavailable. Please restart it and try again.'));
+              }
+              // else still 'processing' — keep polling
+            } catch (pollErr) {
+              // Network hiccup — don't abort, just wait for next tick
+              console.warn('Poll error (retrying):', pollErr.message);
+            }
+          }, POLL_INTERVAL);
+        });
+
         if (!result.success) {
-          throw new Error(result.error || 'Course generation failed');
+          throw new Error(result.message || result.error || 'Course generation failed');
         }
 
         // Transform the API response to match frontend expectations
         const transformedData = transformCourseData(result.course_data, courseUrl);
+
+        // Restore saved completion state from history
+        try {
+          const histRes = await fetch('/api/learning-history');
+          const histData = await histRes.json();
+          if (histData.success && Array.isArray(histData.history)) {
+            const saved = histData.history.find(h => h.videoUrl === courseUrl);
+            if (saved?.completedLessonIds?.length) {
+              const completedSet = new Set(saved.completedLessonIds);
+              transformedData.lessons = transformedData.lessons.map(l => ({
+                ...l,
+                completed: completedSet.has(l.id),
+              }));
+            }
+            if (saved?.lastLessonId) {
+              const lastLesson = transformedData.lessons.find(l => l.id === saved.lastLessonId);
+              if (lastLesson) setSelectedLessonId(saved.lastLessonId);
+              else setSelectedLessonId(transformedData.lessons[0]?.id);
+            } else {
+              setSelectedLessonId(transformedData.lessons[0]?.id);
+            }
+          } else {
+            setSelectedLessonId(transformedData.lessons[0]?.id);
+          }
+        } catch {
+          setSelectedLessonId(transformedData.lessons[0]?.id);
+        }
+
         setCourseData(transformedData);
-        setSelectedLessonId(transformedData.lessons[0]?.id);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching course data:', err);
@@ -88,13 +182,43 @@ export default function LearningPage() {
     }
   }, [courseData]);
 
+  // Save history whenever lessons or selected lesson changes — always includes progress
+  useEffect(() => {
+    if (!courseData || !courseUrl || !session?.user?.id || !lessons.length) return;
+    const completedLessonIds = lessons.filter(l => l.completed).map(l => l.id);
+    const payload = {
+      videoUrl: courseUrl,
+      courseTitle: courseData.courseInfo?.title || 'Untitled Course',
+      courseSubtitle: courseData.courseInfo?.subtitle || '',
+      totalLessons: lessons.length,
+      completedLessons: completedLessonIds.length,
+      completedLessonIds,
+      lastLessonId: selectedLessonId ?? null,
+    };
+    fetch('/api/learning-history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  }, [courseUrl, selectedLessonId, session?.user?.id, lessons]);
+
+  // Auto-mark the current lesson as complete when navigating to a different lesson
+  const handleLessonNavigation = (newLessonId) => {
+    if (selectedLessonId && selectedLessonId !== newLessonId) {
+      setLessons(prev => prev.map(l =>
+        l.id === selectedLessonId ? { ...l, completed: true } : l
+      ));
+    }
+    setSelectedLessonId(newLessonId);
+  };
+
   const calculateProgress = () => {
     if (!lessons.length) return "0/0";
     const completedCount = lessons.filter(lesson => lesson.completed).length;
     return `${completedCount}/${lessons.length}`;
   };
 
-  const selectedLesson = courseData?.lessons?.find(lesson => lesson.id === selectedLessonId);
+  const selectedLesson = lessons.find(lesson => lesson.id === selectedLessonId);
 
   // Transform API response to frontend format
   const transformCourseData = (apiData, originalUrl) => {
@@ -312,7 +436,7 @@ export default function LearningPage() {
   });
 
   if (loading) {
-    return <LoadingSpinner isDarkTheme={isDarkTheme} />;
+    return <LoadingSpinner isDarkTheme={isDarkTheme} message={loadingMessage} />;
   }
 
   if (error && !courseData) {
@@ -333,7 +457,7 @@ export default function LearningPage() {
     );
   }
 
-  const { courseInfo, videoSource } = courseData;
+  const { videoSource } = courseData;
   const currentProgress = calculateProgress();
 
   return (
@@ -343,22 +467,22 @@ export default function LearningPage() {
         setIsDarkTheme={setIsDarkTheme}
       />
       <div className="flex">
-        <LessonContent 
-          courseInfo={courseInfo}
+        <LessonContent
           selectedLesson={selectedLesson}
+          lessons={lessons}
+          selectedLessonId={selectedLessonId}
+          setSelectedLessonId={handleLessonNavigation}
           currentProgress={currentProgress}
           lessonType={lessonType}
           setLessonType={setLessonType}
-          showQuiz={showQuiz}
-          setShowQuiz={setShowQuiz}
           isDarkTheme={isDarkTheme}
           videoSource={videoSource}
         />
-        <CourseSidebar 
+        <CourseSidebar
           lessons={lessons}
           setLessons={setLessons}
           selectedLessonId={selectedLessonId}
-          setSelectedLessonId={setSelectedLessonId}
+          setSelectedLessonId={handleLessonNavigation}
           isDarkTheme={isDarkTheme}
         />
       </div>
