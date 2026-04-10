@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import NavigationBar from "@/components/learning/NavigationBar";
 import LessonContent from "@/components/learning/LessonContent";
@@ -17,9 +17,11 @@ export default function LearningPage() {
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Starting...');
+  const [slowWarning, setSlowWarning] = useState(false);
   const [error, setError] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const abortRef = React.useRef(false);
 
   // Get course URL from search params
   const courseUrl = searchParams.get('url');
@@ -77,10 +79,11 @@ export default function LearningPage() {
           sessionStorage.setItem(storageKey, jobId);
         }
 
-        // Step 2: Poll until complete
-        const POLL_INTERVAL = 5000; // 5 seconds
-        const MAX_WAIT = 10 * 60 * 1000; // 10 minutes
+        // Step 2: Poll until complete — no hard frontend timeout so long videos can finish
+        const POLL_INTERVAL = 5000;        // 5 seconds between polls
+        const SLOW_THRESHOLD = 10 * 60 * 1000; // show warning after 10 min
         const started = Date.now();
+        abortRef.current = false;
 
         const messages = [
           'Extracting transcript...',
@@ -94,14 +97,21 @@ export default function LearningPage() {
 
         const result = await new Promise((resolve, reject) => {
           const interval = setInterval(async () => {
+            // User clicked "Cancel" from the loading screen
+            if (abortRef.current) {
+              clearInterval(interval);
+              sessionStorage.removeItem(storageKey);
+              reject(new Error('__ABORTED__'));
+              return;
+            }
+
             // Cycle loading messages for better UX
             setLoadingMessage(messages[msgIndex % messages.length]);
             msgIndex++;
 
-            if (Date.now() - started > MAX_WAIT) {
-              clearInterval(interval);
-              reject(new Error('Course generation timed out. Please try again.'));
-              return;
+            // After SLOW_THRESHOLD, show a non-blocking warning — keep polling
+            if (!slowWarning && Date.now() - started > SLOW_THRESHOLD) {
+              setSlowWarning(true);
             }
 
             try {
@@ -167,6 +177,11 @@ export default function LearningPage() {
         setCourseData(transformedData);
         setLoading(false);
       } catch (err) {
+        if (err.message === '__ABORTED__') {
+          // User cancelled — go back silently
+          window.history.back();
+          return;
+        }
         console.error('Error fetching course data:', err);
         setError(err.message);
         setLoading(false);
@@ -436,7 +451,13 @@ export default function LearningPage() {
   });
 
   if (loading) {
-    return <LoadingSpinner isDarkTheme={isDarkTheme} message={loadingMessage} />;
+    return (
+      <LoadingSpinner
+        isDarkTheme={isDarkTheme}
+        message={loadingMessage}
+        slowWarning={slowWarning}
+      />
+    );
   }
 
   if (error && !courseData) {

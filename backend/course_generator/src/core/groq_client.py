@@ -50,8 +50,9 @@ class GroqClient:
             # heuristic: ~4 characters per token (conservative)
             return max(0, total_chars // 4)
 
-        # Configurable token safety limit (Groq account-level TPM limit per minute)
-        token_limit = int(os.getenv("GROQ_TOKEN_LIMIT", "2000"))
+        # Per-request context budget. Groq's llama-3.1-8b-instant supports 128k tokens.
+        # Keep at 8000 to stay well within free-tier TPM limits while allowing large prompts.
+        token_limit = int(os.getenv("GROQ_TOKEN_LIMIT", "8000"))
         # Force truncation in case of TPM overflow
         auto_truncate = True
 

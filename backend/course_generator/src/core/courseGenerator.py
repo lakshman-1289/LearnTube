@@ -25,18 +25,24 @@ class CourseGenerator:
     def _get_target_lesson_range(transcript_text: str) -> Tuple[int, int]:
         """
         Returns (min_lessons, max_lessons) based on transcript word count.
-        < 2000 words  → 1–2 lessons
-        2000–6000     → 2–4 lessons
-        6000+         → 4–6 lessons
+        < 2 000 words   →  1– 3 lessons  (short clip, ~10 min)
+        2 000–6 000     →  3– 6 lessons  (medium, ~30 min)
+        6 000–20 000    →  6–10 lessons  (long,   ~60–90 min)
+        20 000–60 000   → 10–15 lessons  (very long, ~3–6 h)
+        60 000+         → 15–20 lessons  (20 h course)
         """
         word_count = len(transcript_text.split())
         print(f"[PIPELINE] 📏 Transcript word count: {word_count}")
-        if word_count < 2000:
-            return 1, 2
-        elif word_count < 6000:
-            return 2, 4
+        if word_count < 2_000:
+            return 1, 3
+        elif word_count < 6_000:
+            return 3, 6
+        elif word_count < 20_000:
+            return 6, 10
+        elif word_count < 60_000:
+            return 10, 15
         else:
-            return 4, 6
+            return 15, 20
 
     async def generate_complete_course(self, transcript_text: str, video_title: str, video_url: str = "original_video_url") -> Dict:
         """
