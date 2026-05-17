@@ -23,27 +23,18 @@ async def generate_course_from_transcript(transcript_content: str) -> dict:
     # Initialize components
     processor = TranscriptProcessor()
     groq_client = GroqClient(api_key=os.getenv("GROQ_API_KEY"))
-    course_generator = CourseGenerator(groq_client, processor)
-    
-    # Prepare transcript JSON
-    transcript_json = {"content": transcript_content}
-    
-    # Validate transcript
-    if not processor.validate_transcript(transcript_json):
-        raise ValueError("Invalid transcript content")
-    
-    # Enhance transcript quality
-    enhanced_transcript = processor.enhance_transcript_quality(transcript_json)
+    course_generator = CourseGenerator()
     
     try:
         # Generate course
-        course_data = await course_generator.generate_complete_course(enhanced_transcript)
+        course_data = await course_generator.generate_complete_course(
+            transcript_text=transcript_content,
+            video_title="Test Video",
+            video_url="https://youtube.com/test"
+        )
         return course_data
     except Exception as e:
         raise Exception(f"Course generation failed: {str(e)}")
-    finally:
-        if hasattr(groq_client, 'session') and groq_client.session:
-            await groq_client.session.close()
 
 async def main():
     """

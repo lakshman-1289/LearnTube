@@ -1,36 +1,31 @@
 from typing import Dict, Tuple
-from course_generator.src.core.groq_client import GroqClient
+from course_generator.src.core.langchain_utils import get_json_llm, build_transcript_retriever
 from course_generator.src.pipeline.topic_extractor import TopicExtractor
 from course_generator.src.pipeline.lesson_planner import LessonPlanner
 from course_generator.src.pipeline.content_generator import ContentGenerator
 from course_generator.src.pipeline.quiz_generator import QuizGenerator
 from course_generator.src.pipeline.course_assembler import CourseAssembler
 from models.pipeline_schemas import FinalCourse
+import asyncio
 
 class CourseGenerator:
     """
     Acts as the Orchestrator for the entire course generation pipeline.
-    Linearly processes nodes: Topic -> Lesson -> Content -> Quizzes -> Assembly
+    Uses LangChain abstractions (Retrievers, LCEL) where applicable.
     """
-    def __init__(self, groq_client: GroqClient):
-        self.client = groq_client
+    def __init__(self, groq_client=None):
+        # We keep the param for backward compatibility in routers, but ignore it.
+        # Initialize LangChain LLM
+        self.llm = get_json_llm()
 
-        # Initialize specialized agents
-        self.topic_extractor = TopicExtractor(self.client)
-        self.lesson_planner = LessonPlanner(self.client)
-        self.content_generator = ContentGenerator(self.client)
-        self.quiz_generator = QuizGenerator(self.client)
+        # Initialize specialized LCEL agents
+        self.topic_extractor = TopicExtractor(self.llm)
+        self.lesson_planner = LessonPlanner(self.llm)
+        self.content_generator = ContentGenerator(self.llm)
+        self.quiz_generator = QuizGenerator(self.llm)
 
     @staticmethod
     def _get_target_lesson_range(transcript_text: str) -> Tuple[int, int]:
-        """
-        Returns (min_lessons, max_lessons) based on transcript word count.
-        < 2 000 words   →  1– 3 lessons  (short clip, ~10 min)
-        2 000–6 000     →  3– 6 lessons  (medium, ~30 min)
-        6 000–20 000    →  6–10 lessons  (long,   ~60–90 min)
-        20 000–60 000   → 10–15 lessons  (very long, ~3–6 h)
-        60 000+         → 15–20 lessons  (20 h course)
-        """
         word_count = len(transcript_text.split())
         print(f"[PIPELINE] 📏 Transcript word count: {word_count}")
         if word_count < 2_000:
@@ -46,7 +41,7 @@ class CourseGenerator:
 
     async def generate_complete_course(self, transcript_text: str, video_title: str, video_url: str = "original_video_url") -> Dict:
         """
-        Coordinates the pipeline execution and returns dict mapping to FinalCourse JSON format.
+        Coordinates the pipeline execution using LangChain Retrievers and LCEL components.
         """
         try:
             min_lessons, max_lessons = self._get_target_lesson_range(transcript_text)
@@ -60,33 +55,24 @@ class CourseGenerator:
             lesson_plan = await self.lesson_planner.plan_lessons(topics, min_lessons=min_lessons, max_lessons=max_lessons)
             print(f"[PIPELINE] ✅ Planned {len(lesson_plan.lessons)} lessons.")
             
-            from course_generator.src.pipeline.chunking_service import chunking_service
-            import math
-            import asyncio
-            
-            chunks = chunking_service.chunk_transcript(transcript_text)
+            # --- LANGCHAIN RAG INTEGRATION ---
+            print("[PIPELINE] 📚 Building Document Retriever for RAG...")
+            retriever = build_transcript_retriever(transcript_text)
             
             lesson_contents = []
             lesson_quizzes = []
 
-            # We process contents and quizzes sequentially (or concurrently if we used asyncio.gather)
+            # Process contents and quizzes. 
+            # We iterate sequentially to respect Groq free tier limit of 12000 TPM
+            # LangChain LCEL supports .batch(), but we use sequential to inject sleep.
             for i, lesson_outline in enumerate(lesson_plan.lessons):
                 print(f"[PIPELINE] 📖 Generating content for Lesson {i+1}/{len(lesson_plan.lessons)}: {lesson_outline.title}")
                 
-                # Linearly map the lesson index to a chunk to keep requests under TPM limits
-                chunk_index = math.floor((i / max(len(lesson_plan.lessons), 1)) * len(chunks))
-                chunk_index = min(chunk_index, len(chunks) - 1)
-                
-                # Combine current chunk and the next one to ensure conceptual boundaries aren't heavily cut
-                context_chunks = [chunks[chunk_index]]
-                if chunk_index < len(chunks) - 1:
-                    context_chunks.append(chunks[chunk_index + 1])
-                mapped_transcript_context = " ".join(context_chunks)
-                
+                # Fetch context and generate content via LCEL + Retriever
                 content = await self.content_generator.generate_lesson_content(
                     lesson_title=lesson_outline.title,
                     lesson_subtitle=lesson_outline.subtitle,
-                    transcript_context=mapped_transcript_context # Passing contextual chunks instead of full 30k str
+                    retriever=retriever
                 )
                 lesson_contents.append(content)
                 
@@ -94,7 +80,6 @@ class CourseGenerator:
                 quizzes = await self.quiz_generator.generate_quizzes(content)
                 lesson_quizzes.append(quizzes)
                 
-                # Add delay to respect Groq free tier limit of 12000 TPM
                 if i < len(lesson_plan.lessons) - 1:
                     print("[PIPELINE] ⏱️ Sleeping 15s to keep Groq TPM boundaries safe...")
                     await asyncio.sleep(15)

@@ -102,7 +102,8 @@ def _get_transcript_youtube_api(video_id: str, lang="en"):
         )
 
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            api = YouTubeTranscriptApi()
+            transcript_list = api.list(video_id)
         except (TranscriptsDisabled, NoTranscriptFound):
             return None
 
@@ -126,10 +127,7 @@ def _get_transcript_youtube_api(video_id: str, lang="en"):
         #     We do NOT call .translate("en") here because YouTube's translation
         #     endpoint is aggressively rate-limited (429) for server-side requests.
         if transcript is None:
-            all_transcripts = (
-                list(transcript_list._generated_transcripts.values())
-                + list(transcript_list._manually_created_transcripts.values())
-            )
+            all_transcripts = list(transcript_list)
             for t in all_transcripts:
                 try:
                     transcript = t
@@ -143,9 +141,9 @@ def _get_transcript_youtube_api(video_id: str, lang="en"):
 
         data = transcript.fetch()
         segments = [
-            {"start": seg["start"], "text": seg.get("text", "").strip()}
+            {"start": seg.start, "text": seg.text.strip()}
             for seg in data
-            if seg.get("text")
+            if getattr(seg, "text", None)
         ]
 
         if not segments:
@@ -252,7 +250,7 @@ def _get_transcript_ytdlp(video_id: str, lang="en"):
         "socket_timeout": 15,
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "web"],
+                "player_client": ["web", "mweb", "ios", "default"],
             }
         },
     }
@@ -388,7 +386,15 @@ def _get_transcript_asr(video_id: str, lang="en") -> Optional[Dict[str, Any]]:
     import sys
     import shutil
 
-    if not shutil.which("ffmpeg"):
+    ffmpeg_path = shutil.which("ffmpeg")
+    if not ffmpeg_path:
+        try:
+            import imageio_ffmpeg
+            ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+        except ImportError:
+            pass
+
+    if not ffmpeg_path or not os.path.exists(ffmpeg_path):
         print("[WARN] ffmpeg not found, skipping ASR fallback")
         return None
 
@@ -401,6 +407,8 @@ def _get_transcript_asr(video_id: str, lang="en") -> Optional[Dict[str, Any]]:
 
             dl_cmd = [
                 sys.executable, "-m", "yt_dlp",
+                "--extractor-args", "youtube:player_client=web,mweb,ios,default",
+                "--ffmpeg-location", ffmpeg_path,
                 "-x", "--audio-format", "mp3",
                 "-o", raw_audio, url,
             ]
@@ -413,7 +421,7 @@ def _get_transcript_asr(video_id: str, lang="en") -> Optional[Dict[str, Any]]:
             )
 
             trim_cmd = [
-                "ffmpeg", "-y",
+                ffmpeg_path, "-y",
                 "-i", raw_audio_mp3,
                 "-t", "600",
                 "-c", "copy",

@@ -41,22 +41,25 @@ class CourseResponse(BaseModel):
 # Initialize components
 processor = TranscriptProcessor()
 client = GroqClient(api_key=os.getenv("GROQ_API_KEY"))
-course_generator = CourseGenerator(client, processor)
+course_generator = CourseGenerator()
 
 @app.post("/generate-course", response_model=CourseResponse)
 async def generate_course_from_transcript(transcript: CourseGeneratorInput):
     """
-    Test endpoint: Convert transcript JSON to complete course structure
+    Test endpoint: Convert transcript to complete course structure
     """
     try:
         # Input validation
-        transcript_json = {"content": transcript.content}
-        if not processor.validate_transcript(transcript_json):
+        if not transcript.content or len(transcript.content) < 100:
             raise HTTPException(status_code=400, detail="Invalid transcript content")
         
         # Process through your complete pipeline
         start_time = time.time()
-        course_data = await course_generator.generate_complete_course(transcript_json)
+        course_data = await course_generator.generate_complete_course(
+            transcript_text=transcript.content,
+            video_title="API Test Video",
+            video_url="https://youtube.com/test"
+        )
         processing_time = time.time() - start_time
         
         # Processing statistics
