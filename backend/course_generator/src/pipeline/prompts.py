@@ -8,10 +8,18 @@ content_parser = PydanticOutputParser(pydantic_object=LessonContent)
 quiz_parser = PydanticOutputParser(pydantic_object=QuizList)
 
 class Prompts:
+    MAP_TOPIC_EXTRACTION = ChatPromptTemplate.from_messages([
+        ("system", "You are an expert content analyzer.\n\n"
+                   "Extract a MAXIMUM of 3 most critical micro-topics from the provided transcript segment.\n"
+                   "Output exactly a JSON object mapping to the requested schema. DO NOT wrap the JSON in markdown blocks (```json) or `<function>` tags.\n"
+                   "{format_instructions}"),
+        ("human", "### 📦 Transcript Segment:\n{transcript}")
+    ]).partial(format_instructions=topic_parser.get_format_instructions())
+
     TOPIC_EXTRACTION = ChatPromptTemplate.from_messages([
         ("system", "You are an expert course architect.\n\n"
                    "### 🎯 Goal\n"
-                   "Analyze the provided transcript and extract a logically ordered list of main topics covered.\n\n"
+                   "Analyze the provided transcript or micro-topics and extract a logically ordered list of main topics covered.\n\n"
                    "### ⚠️ Rules\n"
                    "1. Topics must be distinct and sequential based on the transcript.\n"
                    "2. Provide a short summary of each topic.\n"
@@ -20,7 +28,7 @@ class Prompts:
                    "### 🛑 CRITICAL INSTRUCTION\n"
                    "DO NOT output the JSON schema definition. ONLY output the final populated JSON object containing your actual extracted topics. Do not include any explanations.\n\n"
                    "{format_instructions}"),
-        ("human", "### 📦 Transcript:\n{transcript}")
+        ("human", "### 📦 Content:\n{transcript}")
     ]).partial(format_instructions=topic_parser.get_format_instructions())
 
     LESSON_PLANNER = ChatPromptTemplate.from_messages([
@@ -33,7 +41,8 @@ class Prompts:
                    "3. Do not generate the actual content yet, just the outline mapping the `title`, `subtitle`, and `videoMeta`.\n"
                    "4. Return strictly valid JSON formatted to the `LessonPlan` schema.\n\n"
                    "### 🛑 CRITICAL INSTRUCTION\n"
-                   "DO NOT output the JSON schema definition. ONLY output the final populated JSON object containing your actual generated lesson plans. Do not include any explanations.\n\n"
+                   "DO NOT output the JSON schema definition. ONLY output the final populated JSON object containing your actual generated lesson plans. Do not include any explanations.\n"
+                   "IMPORTANT: Your output MUST be a JSON object with a single root key called `lessons` which contains the array of lesson objects. Do NOT output a raw JSON array.\n\n"
                    "{format_instructions}"),
         ("human", "### 📦 Topics:\n{topics_json}")
     ]).partial(format_instructions=lesson_plan_parser.get_format_instructions())

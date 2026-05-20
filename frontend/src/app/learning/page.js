@@ -115,7 +115,8 @@ export default function LearningPage() {
             }
 
             try {
-              const pollRes = await fetch(`/api/course-status/${jobId}`);
+              // Add a cache-busting timestamp to absolutely guarantee the browser doesn't cache the polling response
+              const pollRes = await fetch(`/api/course-status/${jobId}?t=${Date.now()}`, { cache: 'no-store' });
               const pollData = await pollRes.json();
 
               if (pollData.status === 'completed') {

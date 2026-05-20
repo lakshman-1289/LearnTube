@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from course_generator.src.core.transcript_processor import TranscriptProcessor
-from course_generator.src.core.groq_client import GroqClient
+
 from course_generator.src.core.courseGenerator import CourseGenerator
 
 # Load environment variables
@@ -22,7 +22,7 @@ async def generate_course_from_transcript(transcript_content: str) -> dict:
     """
     # Initialize components
     processor = TranscriptProcessor()
-    groq_client = GroqClient(api_key=os.getenv("GROQ_API_KEY"))
+    course_gen = CourseGenerator()
     course_generator = CourseGenerator()
     
     try:

@@ -1,4 +1,4 @@
-"""Pydantic models shared across transcript, chapter, and backend services."""
+"""Pydantic models shared across transcript and backend services."""
 from pydantic import BaseModel, Field
 from typing import List, Optional, Any
 
@@ -21,22 +21,6 @@ class TranscriptResponse(BaseModel):
     metadata: dict = Field(default_factory=dict)
     segments: List[TranscriptSegment]
     transcript: str
-
-
-class ChapterItem(BaseModel):
-    """A chapter with title and start time."""
-    title: str
-    time: float = Field(..., description="Start time in seconds")
-
-
-class ChapterRequest(BaseModel):
-    """Request body for chapter generation."""
-    segments: List[TranscriptSegment]
-
-
-class ChapterResponse(BaseModel):
-    """Response from chapter generation."""
-    chapters: List[ChapterItem]
 
 
 class CourseGeneratorInput(BaseModel):

@@ -73,10 +73,7 @@ async def classify_video_content(title: str, transcript_excerpt: str) -> str:
     if keyword_result is not None:
         return keyword_result
 
-    groq_api_key = os.getenv("GROQ_API_KEY")
-    if not groq_api_key:
-        print("[CLASSIFIER] No API key — skipping LLM classification")
-        return "educational"
+    # Removed hardcoded Groq API check, the LLMFactory will handle provider validation.
 
     excerpt = (transcript_excerpt or "")[:600].strip()
 
@@ -96,41 +93,27 @@ async def classify_video_content(title: str, transcript_excerpt: str) -> str:
     )
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {groq_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "llama-3.1-8b-instant",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 20,
-                    "temperature": 0.0,
-                },
-                timeout=aiohttp.ClientTimeout(total=20),
-            ) as resp:
-                if resp.status != 200:
-                    print(f"[CLASSIFIER] Groq returned {resp.status} — failing open")
-                    return "educational"
+        from course_generator.src.core.llm_provider.factory import LLMFactory
+        from course_generator.src.core.llm_provider.interfaces import ModelCapability
+        
+        llm = LLMFactory.get_llm(capability=ModelCapability.FAST_JSON, temperature=0.0)
+        
+        resp = await llm.ainvoke(prompt)
+        raw = resp.content.strip()
 
-                data = await resp.json()
-                raw = data["choices"][0]["message"]["content"].strip()
+        # Strip markdown fences if present
+        if "```" in raw:
+            raw = raw.split("```")[1].replace("json", "").strip()
 
-                # Strip markdown fences if present
-                if "```" in raw:
-                    raw = raw.split("```")[1].replace("json", "").strip()
+        parsed = json.loads(raw)
+        category = str(parsed.get("category", "educational")).lower()
 
-                parsed = json.loads(raw)
-                category = str(parsed.get("category", "educational")).lower()
+        if category not in ("educational", "entertainment", "other"):
+            print(f"[CLASSIFIER] Unknown category '{category}' — defaulting to educational")
+            category = "educational"
 
-                if category not in ("educational", "entertainment", "other"):
-                    print(f"[CLASSIFIER] Unknown category '{category}' — defaulting to educational")
-                    category = "educational"
-
-                print(f"[CLASSIFIER] '{title}' classified as: {category}")
-                return category
+        print(f"[CLASSIFIER] '{title}' classified as: {category}")
+        return category
 
     except Exception as exc:
         print(f"[CLASSIFIER] Error (failing open): {exc}")

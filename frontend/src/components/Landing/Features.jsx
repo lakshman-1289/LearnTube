@@ -11,8 +11,8 @@ const features = [
     color: 'from-red-400 to-orange-400',
     bg: 'bg-red-50',
     border: 'border-red-100',
-    title: 'Convert Videos to Courses',
-    desc: 'Paste any YouTube URL and instantly get a structured, multi-lesson course with AI-extracted knowledge from the video transcript.',
+    title: 'Semantic Compression',
+    desc: 'Powered by HuggingFace embeddings and K-Means clustering. We mathematically isolate the core syllabus from massive transcripts to eliminate token bloat.',
   },
   {
     icon: (
@@ -23,8 +23,8 @@ const features = [
     color: 'from-blue-500 to-indigo-500',
     bg: 'bg-blue-50',
     border: 'border-blue-100',
-    title: 'AI Generated Lessons',
-    desc: 'Each lesson is intelligently crafted with an introduction, key concept sections, and a conclusion — structured for maximum retention.',
+    title: 'Map-Reduce Orchestration',
+    desc: 'Built on LangGraph. Our hierarchical map-reduce pipelines gracefully handle 50,000+ word transcripts while strictly respecting LLM API rate limits.',
   },
   {
     icon: (
@@ -35,8 +35,8 @@ const features = [
     color: 'from-purple-500 to-pink-500',
     bg: 'bg-purple-50',
     border: 'border-purple-100',
-    title: 'Interactive Quizzes',
-    desc: 'Test your knowledge after every lesson with auto-generated multiple-choice quizzes tailored to the video content.',
+    title: 'True RAG Architecture',
+    desc: 'Local FAISS vector stores dynamically retrieve high-density transcript chunks during generation, ensuring deep educational density with zero hallucination.',
   },
   {
     icon: (
@@ -47,8 +47,8 @@ const features = [
     color: 'from-green-500 to-teal-500',
     bg: 'bg-green-50',
     border: 'border-green-100',
-    title: 'Track Your Progress',
-    desc: 'Your learning history is saved automatically. Resume any course, track completion, and see your growth over time.',
+    title: 'Bounded Queue Workers',
+    desc: 'Asynchronous token-aware worker pools with exponential backoff prevent TPM explosions and guarantee 100% fault-tolerant asynchronous course assembly.',
   },
 ];
 
@@ -110,13 +110,13 @@ export default function Features() {
         {/* Header */}
         <div className="text-center mb-16 reveal">
           <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-            ✨ What you get
+            ✨ Engineering Excellence
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-            Everything you need to <span className="grad-text">learn effectively</span>
+            Built for <span className="grad-text">Production Scale</span>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            LearnTube combines AI transcription, lesson generation, and progress tracking into one seamless experience.
+            LearnTube is engineered with state-of-the-art AI infrastructure to process infinite-length educational videos with atomic reliability.
           </p>
         </div>
 

@@ -3,10 +3,12 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 
 from routers.course_routes import router as course_router
 from routers.auth_routes import router as auth_router
 from routers.exam_routes import router as exam_router
+from services.db_service import db_service
 
 # Load environment variables
 env_path = Path(__file__).parent / ".env"
@@ -16,10 +18,19 @@ load_dotenv(dotenv_path=env_path)
 if not os.getenv("HF_TOKEN"):
     os.environ["HF_TOKEN"] = "your_token_here"
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: safely initialize DB indexes and sweep zombie jobs
+    await db_service.init_db_async()
+    yield
+    # Shutdown
+    print("[SERVER] Shutting down...")
+
 app = FastAPI(
     title="LearnTube Modular Backend",
     version="3.0.0",
     description="LearnTube backend — courses, auth, exams, certificates.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -41,4 +52,4 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, access_log=False)

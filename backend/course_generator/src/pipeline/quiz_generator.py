@@ -1,11 +1,11 @@
 from models.pipeline_schemas import LessonContent, QuizList
-from course_generator.src.core.langchain_utils import get_json_llm
+from course_generator.src.core.langchain_utils import get_json_llm, build_robust_structured_chain
 from course_generator.src.pipeline.prompts import Prompts
 
 class QuizGenerator:
     def __init__(self, llm=None):
         self.llm = llm or get_json_llm()
-        self.chain = (Prompts.QUIZ_GENERATOR | self.llm.with_structured_output(QuizList, method="json_mode")).with_retry(stop_after_attempt=3)
+        self.chain = build_robust_structured_chain(Prompts.QUIZ_GENERATOR, QuizList, self.llm)
 
     async def generate_quizzes(self, lesson_content: LessonContent) -> QuizList:
         """

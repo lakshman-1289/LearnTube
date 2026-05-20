@@ -29,14 +29,22 @@ def safe_request(url):
     return None
 
 
-# ---------------- GROQ TRANSLATION (sync) ----------------
-def _translate_with_groq(text: str, source_lang: str) -> str:
+# ---------------- LLM TRANSLATION (sync) ----------------
+def _translate_transcript(text: str, source_lang: str) -> str:
     """
-    Translate a transcript to English using Groq API (synchronous requests).
+    Translate a transcript to English using the centralized LLM Factory.
     Split into 3000-char chunks to stay within token limits.
     """
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key or not text:
+    if not text:
+        return text
+
+    from course_generator.src.core.llm_provider.factory import LLMFactory
+    from course_generator.src.core.llm_provider.interfaces import ModelCapability
+
+    try:
+        llm = LLMFactory.get_llm(capability=ModelCapability.FAST_JSON, temperature=0.1)
+    except Exception as e:
+        print(f"[WARN] Failed to initialize LLM for translation: {e}")
         return text
 
     CHUNK_SIZE = 3000
@@ -46,48 +54,15 @@ def _translate_with_groq(text: str, source_lang: str) -> str:
 
     for idx, chunk in enumerate(chunks):
         try:
-            resp = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "llama-3.1-8b-instant",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": (
-                                "You are a professional translator. "
-                                "Translate the text to English exactly as provided. "
-                                "Output ONLY the translated text — no explanations, no markdown."
-                            ),
-                        },
-                        {
-                            "role": "user",
-                            "content": (
-                                f"Translate the following {source_lang} text to English:\n\n{chunk}"
-                            ),
-                        },
-                    ],
-                    "max_tokens": 1500,
-                    "temperature": 0.1,
-                },
-                timeout=30,
+            prompt = (
+                f"You are a professional translator. Translate the following {source_lang} text to English exactly as provided. "
+                f"Output ONLY the translated text — no explanations, no markdown.\n\nText:\n{chunk}"
             )
-            if resp.status_code == 200:
-                translated.append(
-                    resp.json()["choices"][0]["message"]["content"].strip()
-                )
-            else:
-                print(f"[WARN] Translation chunk {idx+1} returned {resp.status_code}, keeping original")
-                translated.append(chunk)
+            resp = llm.invoke(prompt)
+            translated.append(resp.content.strip())
         except Exception as e:
             print(f"[WARN] Translation chunk {idx+1} failed: {e}")
             translated.append(chunk)
-
-        if idx < len(chunks) - 1:
-            time.sleep(2)   # simple rate-limit guard between chunks
 
     return " ".join(translated)
 
@@ -482,10 +457,10 @@ def extract_transcript(youtube_url: str, lang="en"):
         print(f"[INFO] Using transcript source: {result['source']}")
         print(f"[INFO] Detected language: {detected_lang}")
 
-        # If the transcript is not in English, translate via Groq
+        # If the transcript is not in English, translate via LLM
         if not detected_lang.startswith("en") and result.get("transcript"):
-            print(f"[INFO] Non-English transcript ({detected_lang}) — translating to English via Groq...")
-            translated = _translate_with_groq(result["transcript"], detected_lang)
+            print(f"[INFO] Non-English transcript ({detected_lang}) — translating to English via LLM...")
+            translated = _translate_transcript(result["transcript"], detected_lang)
             result["transcript"] = translated
             # Update segments text so downstream chunking uses the translated text
             result["segments"] = [{"start": 0, "text": translated}]

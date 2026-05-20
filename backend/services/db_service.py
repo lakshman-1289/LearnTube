@@ -1,4 +1,5 @@
 import os
+import certifi
 from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional, Dict, List
@@ -31,15 +32,25 @@ class DBService:
             self.exams_col = self.db["exams"]
             self.certs_col = self.db["certificates"]
 
-            import asyncio
-            try:
-                loop = asyncio.get_running_loop()
-                loop.create_task(self._create_indexes())
-            except RuntimeError:
-                pass  # Event loop not running yet
-
         except Exception as e:
             print(f"[DB INIT ERROR] Failed to connect to MongoDB: {e}")
+
+    async def init_db_async(self):
+        """Called safely from FastAPI Lifespan."""
+        print("[DB] Initializing database indexes and cleaning stale jobs...")
+        await self._create_indexes()
+        await self._reset_orphaned_jobs()
+
+    async def _reset_orphaned_jobs(self):
+        try:
+            result = await self.jobs_col.update_many(
+                {"status": "processing"}, 
+                {"$set": {"status": "failed", "error": "Server restarted before job completed."}}
+            )
+            if result.modified_count > 0:
+                print(f"[DB INIT] Cleaned up {result.modified_count} orphaned jobs.")
+        except Exception as e:
+            print(f"[DB INIT ERROR] Failed to clean orphaned jobs: {e}")
 
     async def _create_indexes(self):
         try:
@@ -75,10 +86,10 @@ class DBService:
         youtube_url: str,
         title: str,
         transcript_length: int,
-        chapters: list,
         course_data: Dict,
         user_id: Optional[str] = None,
     ) -> bool:
+        """Saves generated course data to cache. Overwrites existing."""
         if self.collection is None:
             return False
         try:
@@ -87,7 +98,6 @@ class DBService:
                 "url": youtube_url,
                 "title": title,
                 "transcript_length": transcript_length,
-                "chapters": chapters,
                 "course_data": course_data,
                 "cached_at": datetime.now(timezone.utc).isoformat(),
             }
@@ -166,23 +176,56 @@ class DBService:
     #  JOBS (async background processing)
     # ------------------------------------------------------------------ #
 
-    async def create_job(self, job_id: str, video_url: str, user_id: Optional[str] = None) -> bool:
+    async def get_or_create_job(self, job_id: str, video_url: str, user_id: Optional[str] = None) -> Optional[Dict]:
+        """
+        Atomically gets an active processing job or creates a new one.
+        Also sweeps any job that has timed out (stale heartbeat).
+        """
+        from pymongo import ReturnDocument
+        from datetime import timedelta
+        
+        timeout_threshold = datetime.now(timezone.utc) - timedelta(minutes=30)
+        
+        # 1. Sweep stale jobs for this URL
         try:
-            doc = {
-                "job_id": job_id,
-                "status": "processing",
-                "video_url": video_url,
-                "user_id": user_id,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "completed_at": None,
-                "result": None,
-                "error": None,
-            }
-            await self.jobs_col.insert_one(doc)
-            return True
+            await self.jobs_col.update_many(
+                {
+                    "video_url": video_url, 
+                    "status": "processing", 
+                    "updated_at": {"$lt": timeout_threshold.isoformat()}
+                },
+                {"$set": {"status": "failed", "error": "Job timed out (stale processing lock)"}}
+            )
         except Exception as e:
-            print(f"[DB JOB CREATE ERROR]: {e}")
-            return False
+            print(f"[DB STALE SWEEP ERROR]: {e}")
+
+        # 2. Atomic Upsert
+        try:
+            now_iso = datetime.now(timezone.utc).isoformat()
+            doc = await self.jobs_col.find_one_and_update(
+                {"video_url": video_url, "status": "processing"},
+                {
+                    "$setOnInsert": {
+                        "job_id": job_id,
+                        "status": "processing",
+                        "video_url": video_url,
+                        "user_id": user_id,
+                        "created_at": now_iso,
+                        "updated_at": now_iso,
+                        "completed_at": None,
+                        "result": None,
+                        "error": None,
+                    }
+                },
+                upsert=True,
+                return_document=ReturnDocument.AFTER
+            )
+            if doc:
+                doc.pop("_id", None)
+            return doc
+        except Exception as e:
+            print(f"[DB ATOMIC UPSERT ERROR]: {e}")
+            return None
 
     async def get_job(self, job_id: str) -> Optional[Dict]:
         try:
@@ -192,37 +235,46 @@ class DBService:
             return doc
         except Exception as e:
             print(f"[DB JOB READ ERROR]: {e}")
-            return None
+            # Prevent 404s by returning a dummy processing object
+            return {"status": "processing", "job_id": job_id, "note": "Temporary database connection issue"}
 
     async def update_job_completed(self, job_id: str, result: Dict) -> bool:
-        try:
-            await self.jobs_col.update_one(
-                {"job_id": job_id},
-                {"$set": {
-                    "status": "completed",
-                    "result": result,
-                    "completed_at": datetime.now(timezone.utc).isoformat(),
-                }},
-            )
-            return True
-        except Exception as e:
-            print(f"[DB JOB UPDATE ERROR]: {e}")
-            return False
+        import asyncio
+        for attempt in range(3):
+            try:
+                await self.jobs_col.update_one(
+                    {"job_id": job_id},
+                    {"$set": {
+                        "status": "completed",
+                        "result": result,
+                        "completed_at": datetime.now(timezone.utc).isoformat(),
+                    }},
+                )
+                return True
+            except Exception as e:
+                print(f"[DB JOB UPDATE ERROR] Attempt {attempt+1}/3 failed: {e}")
+                if attempt < 2:
+                    await asyncio.sleep(5)
+        return False
 
     async def update_job_failed(self, job_id: str, error: str) -> bool:
-        try:
-            await self.jobs_col.update_one(
-                {"job_id": job_id},
-                {"$set": {
-                    "status": "failed",
-                    "error": error,
-                    "completed_at": datetime.now(timezone.utc).isoformat(),
-                }},
-            )
-            return True
-        except Exception as e:
-            print(f"[DB JOB UPDATE ERROR]: {e}")
-            return False
+        import asyncio
+        for attempt in range(3):
+            try:
+                await self.jobs_col.update_one(
+                    {"job_id": job_id},
+                    {"$set": {
+                        "status": "failed",
+                        "error": error,
+                        "completed_at": datetime.now(timezone.utc).isoformat(),
+                    }},
+                )
+                return True
+            except Exception as e:
+                print(f"[DB JOB UPDATE ERROR] Attempt {attempt+1}/3 failed: {e}")
+                if attempt < 2:
+                    await asyncio.sleep(5)
+        return False
 
     # ------------------------------------------------------------------ #
     #  EXAMS

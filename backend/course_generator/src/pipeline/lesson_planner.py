@@ -1,11 +1,11 @@
 from models.pipeline_schemas import LessonPlan, TopicList
-from course_generator.src.core.langchain_utils import get_json_llm
+from course_generator.src.core.langchain_utils import get_json_llm, build_robust_structured_chain
 from course_generator.src.pipeline.prompts import Prompts
 
 class LessonPlanner:
     def __init__(self, llm=None):
         self.llm = llm or get_json_llm()
-        self.chain = (Prompts.LESSON_PLANNER | self.llm.with_structured_output(LessonPlan, method="json_mode")).with_retry(stop_after_attempt=3)
+        self.chain = build_robust_structured_chain(Prompts.LESSON_PLANNER, LessonPlan, self.llm)
 
     async def plan_lessons(self, topics: TopicList, min_lessons: int = 1, max_lessons: int = 6) -> LessonPlan:
         """
@@ -14,7 +14,7 @@ class LessonPlanner:
         Uses LangChain LCEL.
         """
         # For large topic lists, evenly sample to keep the prompt within LLM context.
-        MAX_TOPICS = 80
+        MAX_TOPICS = 35
         sampled_topics = topics
         if len(topics.topics) > MAX_TOPICS:
             step = max(1, len(topics.topics) // MAX_TOPICS)

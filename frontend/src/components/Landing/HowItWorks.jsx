@@ -11,8 +11,8 @@ const steps = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
       </svg>
     ),
-    title: 'Paste YouTube URL',
-    desc: 'Copy any YouTube video URL and paste it into LearnTube. Works with any public video.',
+    title: 'Ingestion & Vectorization',
+    desc: 'Whisper extracts the transcript, safely chunking it into overlapping semantically dense documents.',
   },
   {
     num: '02',
@@ -23,8 +23,8 @@ const steps = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    title: 'AI Extracts Transcript',
-    desc: 'Our AI automatically pulls the video transcript, even translating non-English content to English.',
+    title: 'Mathematical Clustering',
+    desc: 'Embeddings map the transcript timeline, extracting representative centroids to form the curriculum skeleton.',
   },
   {
     num: '03',
@@ -35,8 +35,8 @@ const steps = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     ),
-    title: 'Generates Structured Lessons',
-    desc: 'AI builds 1–6 lessons with introductions, key points, and conclusions — all tailored to the video topic.',
+    title: 'Autonomous Agents',
+    desc: 'LangGraph orchestrators map the centroids and reduce them hierarchically into a structured JSON lesson plan.',
   },
   {
     num: '04',
@@ -48,8 +48,8 @@ const steps = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: 'Start Learning',
-    desc: 'Navigate lessons, take quizzes, track progress — and resume anytime from where you left off.',
+    title: 'RAG Synthesis',
+    desc: 'Bounded worker pools query the FAISS vector store, synthesizing highly accurate lessons and Pydantic-validated quizzes.',
   },
 ];
 
@@ -70,13 +70,13 @@ export default function HowItWorks() {
         {/* Header */}
         <div className="text-center mb-20 reveal">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-            ⚡ Super simple
+            ⚡ Orchestration Pipeline
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-            From video to course in <span className="grad-text">4 steps</span>
+            Behind the <span className="grad-text">Architecture</span>
           </h2>
           <p className="text-gray-500 max-w-lg mx-auto">
-            No setup, no complexity. Just paste a link and start learning in minutes.
+            A transparent look at the deterministic state machine powering our educational generation engine.
           </p>
         </div>
 

@@ -6,10 +6,9 @@ import asyncio
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from services.transcript_service import extract_transcript
-from services.chapter_service import generate_chapters
 from services.content_classifier import classify_video_content
 from course_generator.src.core.courseGenerator import CourseGenerator
-from course_generator.src.core.groq_client import GroqClient
+
 from services.db_service import db_service
 
 router = APIRouter()
@@ -26,7 +25,7 @@ def _extract_video_id(url: str) -> str:
 
 async def _run_course_pipeline(url: str) -> dict:
     """
-    Shared logic: transcript → chapters → course generation.
+    Shared logic: transcript → course generation.
     Returns the full combined response dict (same shape as the sync endpoint).
     """
     video_id = _extract_video_id(url)
@@ -42,7 +41,6 @@ async def _run_course_pipeline(url: str) -> dict:
             "video_id": cached.get("video_id"),
             "title": cached.get("title"),
             "transcript_length": cached.get("transcript_length"),
-            "chapters": cached.get("chapters", []),
         }
 
     # Extract transcript
@@ -58,7 +56,6 @@ async def _run_course_pipeline(url: str) -> dict:
             "video_id": transcript_result.get("videoId", ""),
             "title": "",
             "transcript_length": 0,
-            "chapters": [],
         }
 
     if not transcript_result or not transcript_result.get("transcript"):
@@ -83,14 +80,7 @@ async def _run_course_pipeline(url: str) -> dict:
             "video_id": transcript_result.get("videoId", ""),
             "title": transcript_result.get("title", ""),
             "transcript_length": len(transcript_text),
-            "chapters": [],
         }
-
-    # Generate chapters
-    log("Generating chapters...")
-    segments = transcript_result.get("segments", [])
-    chapters = generate_chapters(segments) if segments else []
-    chapter_data = [{"title": c.title, "time": c.time} for c in chapters]
 
     # Generate course
     log("Generating course...")
@@ -98,10 +88,8 @@ async def _run_course_pipeline(url: str) -> dict:
     if not groq_api_key:
         raise Exception("GROQ_API_KEY not found in environment variables.")
 
-    groq_client = None
     try:
-        groq_client = GroqClient(api_key=groq_api_key)
-        course_generator = CourseGenerator(groq_client)
+        course_generator = CourseGenerator()
         course_data = await course_generator.generate_complete_course(
             transcript_text=transcript_text,
             video_title=transcript_result["title"],
@@ -110,8 +98,7 @@ async def _run_course_pipeline(url: str) -> dict:
         if isinstance(course_data, dict) and "error" in course_data:
             raise Exception(course_data.get("error", "Course generation failed"))
     finally:
-        if groq_client and hasattr(groq_client, "session") and groq_client.session:
-            await groq_client.session.close()
+        pass
 
     # Cache result
     transcript_len = len(transcript_text)
@@ -120,7 +107,6 @@ async def _run_course_pipeline(url: str) -> dict:
         youtube_url=url,
         title=transcript_result["title"],
         transcript_length=transcript_len,
-        chapters=chapter_data,
         course_data=course_data,
     )
 
@@ -131,7 +117,6 @@ async def _run_course_pipeline(url: str) -> dict:
         "video_id": transcript_result["videoId"],
         "title": transcript_result["title"],
         "transcript_length": transcript_len,
-        "chapters": chapter_data,
     }
 
 
@@ -183,7 +168,21 @@ async def generate_course_async(body: dict, background_tasks: BackgroundTasks):
         raise HTTPException(status_code=400, detail="Missing 'url' or 'youtube_url'")
 
     job_id = str(uuid.uuid4())
-    await db_service.create_job(job_id=job_id, video_url=url)
+    
+    # IDEMPOTENCY CHECK: Atomic Upsert to prevent duplicate jobs and race conditions
+    job_doc = await db_service.get_or_create_job(job_id=job_id, video_url=url)
+    
+    if not job_doc:
+        raise HTTPException(status_code=500, detail="Failed to initialize background job.")
+        
+    # If the returned job_id doesn't match the one we just generated, it means an active job already exists!
+    if job_doc["job_id"] != job_id:
+        log(f"Idempotency hit: URL already processing under job {job_doc['job_id']}")
+        return {
+            "status": "processing", 
+            "job_id": job_doc["job_id"],
+            "note": "Re-attached to existing background job"
+        }
 
     background_tasks.add_task(_background_job, job_id, url)
 

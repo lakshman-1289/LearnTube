@@ -12,7 +12,7 @@ from models.schemas import CourseGeneratorInput
 
 # Now import your modules
 from course_generator.src.core.transcript_processor import TranscriptProcessor
-from course_generator.src.core.groq_client import GroqClient  # Your new Groq wrapper
+
 from course_generator.src.core.courseGenerator import CourseGenerator
 
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -40,7 +40,7 @@ class CourseResponse(BaseModel):
 
 # Initialize components
 processor = TranscriptProcessor()
-client = GroqClient(api_key=os.getenv("GROQ_API_KEY"))
+
 course_generator = CourseGenerator()
 
 @app.post("/generate-course", response_model=CourseResponse)

@@ -51,18 +51,17 @@ export default function Hero() {
         >
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            AI-Powered Learning Platform
+            LearnTube AI v2.0 Architecture
           </div>
 
           <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-            Transform YouTube<br />
-            <span className="grad-text">Videos into</span><br />
-            Structured Courses
-          </h1>
+          AI-Powered<br />
+          <span className="grad-text">Course Generation</span><br />
+          Platform
+        </h1>
 
           <p className="text-lg text-gray-600 mb-8 max-w-lg leading-relaxed">
-            Learn smarter with AI-generated lessons, interactive quizzes, and
-            real-time progress tracking — all from any YouTube video.
+            A production-scale LangGraph orchestration engine combining True RAG, K-Means semantic clustering, and Map-Reduce workflows to synthesize massive YouTube transcripts into validated educational courses.
           </p>
 
           {/* Inline URL form */}
@@ -97,62 +96,73 @@ export default function Hero() {
             <div className="w-72 h-72 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 animate-pulse-ring" />
           </div>
 
-          {/* Lesson card */}
+          {/* Node Graph Card */}
           <FloatingCard delay="0s" rotate="-3deg" className="absolute top-8 left-4 w-64">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-sm font-semibold text-gray-800">Lesson 1 of 4</span>
+              <span className="text-sm font-semibold text-gray-800">LangGraph DAG</span>
             </div>
-            <p className="text-xs font-bold text-gray-700 mb-2">Introduction to Neural Networks</p>
+            <p className="text-xs font-bold text-gray-700 mb-2">Executing Pipeline Nodes</p>
             <div className="space-y-1.5">
-              {['What is a neuron?', 'Layers & weights', 'Activation functions'].map(t => (
-                <div key={t} className="flex items-center gap-2">
-                  <div className="w-3.5 h-3.5 rounded-full bg-green-400 flex items-center justify-center shrink-0">
-                    <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+              {[
+                { name: 'chunk_transcript', status: 'done', color: 'green' },
+                { name: 'semantic_clustering', status: 'done', color: 'green' },
+                { name: 'map_reduce_extraction', status: 'running', color: 'blue' },
+              ].map(t => (
+                <div key={t.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3.5 h-3.5 rounded-full bg-${t.color}-400 flex items-center justify-center shrink-0`}>
+                      {t.status === 'done' ? <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                    </div>
+                    <span className="text-xs font-mono text-gray-600">{t.name}()</span>
                   </div>
-                  <span className="text-xs text-gray-600">{t}</span>
+                  <span className={`text-[10px] font-bold text-${t.color}-500 uppercase tracking-wider`}>{t.status}</span>
                 </div>
               ))}
             </div>
           </FloatingCard>
 
-          {/* Quiz card */}
-          <FloatingCard delay="1.5s" rotate="4deg" className="absolute top-16 right-2 w-60">
+          {/* RAG Card */}
+          <FloatingCard delay="1.5s" rotate="4deg" className="absolute top-16 right-2 w-64">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                 </svg>
               </div>
-              <span className="text-sm font-semibold text-gray-800">Quick Quiz</span>
+              <span className="text-sm font-semibold text-gray-800">FAISS Vector Store</span>
             </div>
-            <p className="text-xs text-gray-700 mb-3 font-medium">What does backpropagation do?</p>
-            {['Updates weights backward', 'Feeds data forward', 'Normalizes inputs'].map((opt, i) => (
-              <div key={opt} className={`text-xs px-3 py-1.5 rounded-lg mb-1.5 ${i === 0 ? 'bg-green-100 text-green-700 font-semibold border border-green-200' : 'bg-gray-50 text-gray-600'}`}>
+            <p className="text-xs text-gray-700 mb-3 font-medium">True RAG Architecture</p>
+            {['Embedding: all-MiniLM-L6-v2', 'Index Type: L2 distance', 'Dimensions: 384'].map((opt, i) => (
+              <div key={opt} className={`text-[11px] font-mono px-3 py-1.5 rounded-lg mb-1.5 bg-gray-50 text-gray-600 border border-gray-100`}>
                 {opt}
               </div>
             ))}
           </FloatingCard>
 
-          {/* Progress card */}
-          <FloatingCard delay="0.8s" rotate="-2deg" className="absolute bottom-24 left-8 w-56">
+          {/* Token Progress Card */}
+          <FloatingCard delay="0.8s" rotate="-2deg" className="absolute bottom-24 left-8 w-60">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <span className="text-sm font-semibold text-gray-800">Your Progress</span>
+              <span className="text-sm font-semibold text-gray-800">Execution Telemetry</span>
             </div>
-            <div className="space-y-2">
-              {[['Lessons', 75], ['Quizzes', 60], ['Overall', 68]].map(([label, pct]) => (
+            <div className="space-y-3">
+              {[
+                { label: 'Token Limits (TPM)', pct: 85, val: '5.1k / 6.0k' },
+                { label: 'Map-Reduce Batches', pct: 40, val: '2 / 5' },
+                { label: 'Queue Workers', pct: 100, val: '1 active' }
+              ].map(({label, pct, val}) => (
                 <div key={label}>
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>{label}</span><span className="font-semibold text-gray-700">{pct}%</span>
+                  <div className="flex justify-between text-[10px] uppercase tracking-wide text-gray-500 mb-1.5">
+                    <span>{label}</span><span className="font-bold text-gray-700">{val}</span>
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all" style={{ width: `${pct}%` }} />
@@ -162,17 +172,17 @@ export default function Hero() {
             </div>
           </FloatingCard>
 
-          {/* AI badge */}
+          {/* Idempotency badge */}
           <FloatingCard delay="2.2s" rotate="3deg" className="absolute bottom-20 right-6 w-48">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-800">AI Generated</p>
-                <p className="text-xs text-gray-500">4 lessons created</p>
+                <p className="text-xs font-bold text-gray-800">Atomic Locks</p>
+                <p className="text-[11px] text-gray-500">Idempotency secured</p>
               </div>
             </div>
           </FloatingCard>
